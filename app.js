@@ -45,13 +45,13 @@
   });
   // Only publish meaningful LocalBusiness structured data when the address is real.
   if (cfg.streetAddress && cfg.city !== 'CITY' && cfg.state !== 'STATE') {
-    const schema = {'@context':'https://schema.org','@type':'ExerciseGym',name:cfg.name || 'IRON GYM',description:'Strength training, coached sessions and fitness programs.',address:{'@type':'PostalAddress',streetAddress:cfg.streetAddress,addressLocality:cfg.city,addressRegion:cfg.state,postalCode:cfg.postalCode || undefined,addressCountry:'US'}};
+    const schema = {'@context':'https://schema.org','@type':'ExerciseGym',name:cfg.name || 'IRON GYM',description:'Strength training, classes and coaching in a focused gym environment.',address:{'@type':'PostalAddress',streetAddress:cfg.streetAddress,addressLocality:cfg.city,addressRegion:cfg.state,postalCode:cfg.postalCode || undefined,addressCountry:'US'}};
     if(/^https:\/\//.test(cfg.websiteUrl || '')) schema.url = cfg.websiteUrl;
     if(cfg.phone) schema.telephone = cfg.phone;
     const script = document.createElement('script');script.type='application/ld+json';script.textContent=JSON.stringify(schema);document.head.append(script);
     if(document.body.dataset.page==='index') {
       document.title = `${cfg.name} — Strength Training in ${cfg.city}, ${cfg.state}`;
-      $('meta[name="description"]').content = `Explore strength training, coaching and memberships at ${cfg.name} in ${cfg.city}, ${cfg.state}. Find your program and plan a first visit.`;
+      $('meta[name="description"]').content = `Explore strength training, coaching and memberships at ${cfg.name} in ${cfg.city}, ${cfg.state}. Explore the photo tour and plan a first visit.`;
     }
   }
 
@@ -92,132 +92,7 @@
   } else $$('.stat-number').forEach(animateCounter);
 
 
-  const savedPathKey = 'iron-gym-forged-training-path-v1';
-  function readSavedPath(){
-    try {
-      const saved=JSON.parse(localStorage.getItem(savedPathKey)||'null');
-      return saved && ['open','performance','coaching'].includes(saved.plan) && ['Strength','Conditioning','Foundations','Small Group'].includes(saved.classType) ? saved : null;
-    } catch {return null;}
-  }
-  function refreshSavedPath(){
-    const saved=readSavedPath();
-    const bar=$('#saved-path');
-    if(!bar)return;
-    bar.hidden=!saved;
-    if(!saved)return;
-    $('#saved-path-name').textContent=(cfg.pricing?.[saved.plan]?.name || saved.plan).toUpperCase();
-    $('#saved-path-summary').textContent=`YOUR FOCUS / ${saved.classType.toUpperCase()} TRAINING`;
-  }
-  $('#forget-path')?.addEventListener('click',()=>{
-    try{localStorage.removeItem(savedPathKey);}catch{}
-    refreshSavedPath();announce('Saved training path cleared.');
-  });
-  refreshSavedPath();
-
-  if ($('#quiz-question-area')) {
-  /* 4. PROGRAM FINDER — FIVE ACTUAL QUESTIONS */
-  const questions = [
-    {title:'WHAT ARE YOU HERE TO BUILD?',subtitle:'Pick the answer that sounds most like you.',options:[
-      {text:'Get noticeably stronger',code:'strength'},{text:'Improve conditioning and energy',code:'conditioning'},
-      {text:'Build a routine I can keep',code:'consistency'},{text:'Learn the basics with confidence',code:'learn'}]},
-    {title:'WHERE ARE YOU STARTING?',subtitle:'No wrong answers. We just want to meet you where you are.',options:[
-      {text:'Brand new to training',code:'new'},{text:'Getting back into it',code:'return'},
-      {text:'I train on and off',code:'some'},{text:'I already train consistently',code:'experienced'}]},
-    {title:'HOW MANY DAYS FIT YOUR REAL LIFE?',subtitle:'Choose the schedule you can reasonably sustain.',options:[
-      {text:'1–2 days per week',code:'few'},{text:'3–4 days per week',code:'moderate'},
-      {text:'5 or more days',code:'many'},{text:'Not sure yet',code:'unsure'}]},
-    {title:'HOW DO YOU LIKE TO TRAIN?',subtitle:'The right environment makes showing up easier.',options:[
-      {text:'On my own, at my pace',code:'solo'},{text:'In a coached group',code:'group'},
-      {text:'One-on-one with a coach',code:'private'},{text:'A little of everything',code:'mixed'}]},
-    {title:'WHAT TENDS TO GET IN YOUR WAY?',subtitle:'We can design around the obstacle, not just the goal.',options:[
-      {text:'I need a clear plan',code:'plan'},{text:'Finding enough time',code:'time'},
-      {text:'Staying accountable',code:'accountability'},{text:'Not knowing the right technique',code:'technique'}]}
-  ];
-  const quiz = {index:0,answers:Array(questions.length).fill(null),complete:false};
-  const questionArea = $('#quiz-question-area'), quizBack = $('#quiz-back'),quizNext=$('#quiz-next');
-  const quizProgressText = $('#quiz-progress-text'),quizProgressFill=$('#quiz-progress-fill');
-  let lastRecommendation = null;
-  function recommend() {
-    const [goal,experience,frequency,style,barrier] = quiz.answers;
-    const score = {open:0,performance:0,coaching:0};
-    if(style==='solo')score.open+=5;
-    if(style==='group')score.performance+=6;
-    if(style==='private')score.coaching+=7;
-    if(style==='mixed'){score.performance+=2;score.coaching+=1;}
-    if(experience==='new'){score.coaching+=3;score.performance+=1;}
-    if(experience==='return'){score.performance+=2;score.coaching+=1;}
-    if(experience==='experienced')score.open+=2;
-    if(goal==='learn'){score.coaching+=3;}
-    if(goal==='consistency'){score.performance+=2;}
-    if(goal==='conditioning'){score.performance+=3;}
-    if(goal==='strength'){score.open+=1;score.coaching+=1;}
-    if(barrier==='technique'||barrier==='plan')score.coaching+=3;
-    if(barrier==='accountability')score.performance+=2;
-    if(barrier==='time')score.open+=2;
-    if(frequency==='few')score.open+=1;
-    if(frequency==='many')score.performance+=1;
-    const plan = Object.entries(score).sort((a,b)=>b[1]-a[1])[0][0];
-    const classType = goal==='conditioning'?'Conditioning':goal==='learn'?'Foundations':goal==='consistency'?'Small Group':'Strength';
-    const reason = {
-      open:'You want the space and flexibility to take ownership of your training. Start with a simple routine you can repeat.',
-      performance:'A combination of solo access and structured classes can help you keep momentum without overcomplicating your week.',
-      coaching:'You would benefit from more individual direction, thoughtful progressions and a coach who can help build confidence.'
-    }[plan];
-    return {plan,classType,reason};
-  }
-  function renderQuiz() {
-    $$('[data-quiz-marker]').forEach((marker,i)=>{
-      marker.classList.toggle('is-current',!quiz.complete && i===quiz.index);
-      marker.classList.toggle('is-complete',quiz.complete || i<quiz.index);
-      if(!quiz.complete && i===quiz.index)marker.setAttribute('aria-current','step');
-      else marker.removeAttribute('aria-current');
-    });
-    quizProgressFill.style.width = `${quiz.complete ? 100 : (quiz.index+1)/questions.length*100}%`;
-    quizProgressText.textContent = quiz.complete?'YOUR TRAINING MATCH':`QUESTION ${String(quiz.index+1).padStart(2,'0')} / 05`;
-    quizBack.hidden = quiz.index===0 && !quiz.complete;
-    if(quiz.complete){
-      const match=recommend();lastRecommendation=match;
-      questionArea.innerHTML=`<div class="quiz-result"><div class="quiz-result-kicker">YOUR RECOMMENDED STARTING POINT</div><h3>${escapeHTML(cfg.pricing?.[match.plan]?.name || match.plan.toUpperCase())}<span class="copper-dot">.</span></h3><p>${escapeHTML(match.reason)}</p><div class="quiz-result-grid"><div><span>RECOMMENDED FORMAT</span><strong>${escapeHTML(match.classType)} TRAINING</strong></div><div><span>FIRST MOVE</span><strong>EXPLORE ${escapeHTML(match.plan.toUpperCase())}</strong></div></div><p class="quiz-result-notice">A starting recommendation, not a fitness assessment. Adjust the plan based on your needs and available programs.</p><div class="save-path-cta"><button type="button" id="save-path">SAVE MY STARTING POINT ↗</button><small id="save-path-note">Optional. Saves only this recommendation on this device—never your quiz answers.</small></div></div>`;
-      quizNext.innerHTML=`SEE MEMBERSHIP OPTIONS ${icon('i-arrow')}`;
-      quizNext.disabled=false;quizBack.textContent='↻ START AGAIN';
-      $('#save-path').addEventListener('click',()=>{
-        try {
-          localStorage.setItem(savedPathKey, JSON.stringify({plan:match.plan,classType:match.classType}));
-          refreshSavedPath();
-          $('#save-path').textContent='SAVED ON THIS DEVICE ✓';
-          $('#save-path').disabled=true;
-          announce('Your training path has been saved on this device.');
-        } catch {
-          $('#save-path-note').textContent='Your browser blocked local storage. You can still compare memberships on the next page.';
-        }
-      });
-
-      announce('Program Finder result: '+(cfg.pricing?.[match.plan]?.name || match.plan));return;
-    }
-    const q=questions[quiz.index],chosen=quiz.answers[quiz.index];
-    questionArea.innerHTML=`<div class="quiz-question-content"><h3>${escapeHTML(q.title)}</h3><p>${escapeHTML(q.subtitle)}</p><div class="quiz-options">${q.options.map((o,i)=>`<button type="button" class="quiz-option" data-answer="${escapeHTML(o.code)}" aria-pressed="${chosen===o.code}"><span class="quiz-option-num">0${i+1}</span><span>${escapeHTML(o.text)}</span>${chosen===o.code?icon('i-check'):''}</button>`).join('')}</div></div>`;
-    $$('.quiz-option',questionArea).forEach(btn=>btn.addEventListener('click',()=>{
-      quiz.answers[quiz.index]=btn.dataset.answer;
-      $$('.quiz-option',questionArea).forEach(b=>{b.setAttribute('aria-pressed',String(b===btn));b.querySelector('svg')?.remove();if(b===btn)b.insertAdjacentHTML('beforeend',icon('i-check'));});
-      quizNext.disabled=false;
-    }));
-    quizNext.disabled=!chosen;quizNext.innerHTML=quiz.index===4?`SHOW MY MATCH ${icon('i-arrow')}`:`NEXT STEP ${icon('i-arrow')}`;
-    quizBack.textContent='← BACK';
-  }
-  quizNext.addEventListener('click',()=>{
-    if(quiz.complete){window.location.assign('memberships.html?plan='+encodeURIComponent((lastRecommendation||recommend()).plan));return;}
-    if(!quiz.answers[quiz.index])return;
-    if(quiz.index===4)quiz.complete=true;else quiz.index++;
-    renderQuiz();
-  });
-  quizBack.addEventListener('click',()=>{
-    if(quiz.complete){quiz.index=0;quiz.complete=false;quiz.answers.fill(null);lastRecommendation=null;}
-    else quiz.index=Math.max(0,quiz.index-1);
-    renderQuiz();
-  });
-  renderQuiz();
-
-  }
+  /* Training quiz retired in favor of direct pages for the tour, pricing and first visit. */
 
   if ($('#day-tabs')) {
   /* 5. WEEKLY CLASS SCHEDULE / CALENDAR EVENT EXPORT */
@@ -320,7 +195,7 @@
     $('#billing-annual').classList.toggle('is-active',billing==='annual');$('#billing-annual').setAttribute('aria-pressed',String(billing==='annual'));
     $('#plan-cards').innerHTML=Object.values(plans).map(plan=>{
       const annual=plan.price*annualMonths,savings=plan.price*12-annual,equivalent=annual/12;
-      return `<article class="plan-card ${plan.popular?'is-popular':''} ${readSavedPath()?.plan===plan.key?'is-saved':''}"><div class="plan-top"><div class="plan-name"><h3>${escapeHTML(plan.name)}</h3>${readSavedPath()?.plan===plan.key?'<span class="saved-match-tag">YOUR SAVED MATCH</span>':plan.popular?'<span>MOST CHOSEN / DEMO</span>':''}</div><p class="plan-subtitle">${escapeHTML(plan.subtitle)}</p><div class="plan-price"><b>${billing==='monthly'?money(plan.price).replace('.00',''):money(equivalent)}</b><span>/MO</span></div><p class="plan-billing">${billing==='annual'?`BILLED ${money(annual)} / YEAR · SAVE ${money(savings)} VS MONTHLY`:'MONTH-TO-MONTH DEMO RATE · NO CONTRACT TERMS PROVIDED'}</p></div><div class="plan-features"><strong>WHAT'S INCLUDED</strong><ul>${plan.features.map(f=>`<li>${icon('i-check')}<span>${escapeHTML(f)}</span></li>`).join('')}</ul></div><div class="plan-bottom"><button type="button" class="button button-copper" data-choose-plan="${plan.key}">${plan.cta} ${icon('i-arrow')}</button><small>Sample pricing and benefits, not an offer.</small></div></article>`;
+      return `<article class="plan-card ${plan.popular?'is-popular':''} "><div class="plan-top"><div class="plan-name"><h3>${escapeHTML(plan.name)}</h3>${plan.popular?'<span>MOST CHOSEN / DEMO</span>':''}</div><p class="plan-subtitle">${escapeHTML(plan.subtitle)}</p><div class="plan-price"><b>${billing==='monthly'?money(plan.price).replace('.00',''):money(equivalent)}</b><span>/MO</span></div><p class="plan-billing">${billing==='annual'?`BILLED ${money(annual)} / YEAR · SAVE ${money(savings)} VS MONTHLY`:'MONTH-TO-MONTH DEMO RATE · NO CONTRACT TERMS PROVIDED'}</p></div><div class="plan-features"><strong>WHAT'S INCLUDED</strong><ul>${plan.features.map(f=>`<li>${icon('i-check')}<span>${escapeHTML(f)}</span></li>`).join('')}</ul></div><div class="plan-bottom"><button type="button" class="button button-copper" data-choose-plan="${plan.key}">${plan.cta} ${icon('i-arrow')}</button><small>Sample pricing and benefits, not an offer.</small></div></article>`;
     }).join('');
     $$('[data-choose-plan]').forEach(btn=>btn.addEventListener('click',()=>selectPlan(btn.dataset.choosePlan)));
     renderValue();
@@ -334,7 +209,7 @@
   $('#billing-annual').addEventListener('click',()=>{billing='annual';renderPlans();});
   Object.values(plans).forEach(plan=>$('#value-plan').add(new Option(plan.name,plan.key)));
   const queryPlan=new URLSearchParams(location.search).get('plan');
-  $('#value-plan').value=plans[queryPlan] ? queryPlan : (readSavedPath()?.plan || 'performance');
+  $('#value-plan').value=plans[queryPlan] ? queryPlan : 'performance';
   function renderValue(){
     const visits=Number($('#visits-slider').value),key=$('#value-plan').value||'performance',plan=plans[key];
     const yearly=billing==='annual'?plan.price*annualMonths:plan.price*12;
@@ -421,11 +296,12 @@
   const dialog=$('#booking-dialog');
   const showDialog=()=>{if(typeof dialog.showModal==='function')dialog.showModal();else dialog.setAttribute('open','');};
   const coaches=[
-    {id:'mara',name:'MARA REYES',role:'STRENGTH & TECHNIQUE',tag:'COACH 01',img:'assets/coach-1.svg',intro:'Clear progressions, excellent form and the confidence to add weight when you are ready.',specialties:['Barbell lifting','Beginner strength','Movement quality']},
-    {id:'jalen',name:'JALEN PRICE',role:'CONDITIONING & PERFORMANCE',tag:'COACH 02',img:'assets/coach-2.svg',intro:'Conditioning built around smart effort. Train hard, recover well, and keep showing up.',specialties:['Conditioning','Work capacity','Athletic performance']},
-    {id:'eli',name:'ELI MORGAN',role:'FOUNDATIONS & MOBILITY',tag:'COACH 03',img:'assets/coach-3.svg',intro:'Simple explanations, useful feedback, and a patient approach to learning the movements.',specialties:['Training fundamentals','Mobility','Recovery habits']}
+    {id:'mara',name:'MARA REYES',role:'STRENGTH & TECHNIQUE',tag:'COACH 01',img:'https://images.unsplash.com/photo-1517838277536-f5f99be501cd?auto=format&fit=crop&w=800&q=82',intro:'Clear progressions, excellent form and the confidence to add weight when you are ready.',specialties:['Barbell lifting','Beginner strength','Movement quality']},
+    {id:'jalen',name:'JALEN PRICE',role:'CONDITIONING & PERFORMANCE',tag:'COACH 02',img:'https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?auto=format&fit=crop&w=800&q=82',intro:'Conditioning built around smart effort. Train hard, recover well, and keep showing up.',specialties:['Conditioning','Work capacity','Athletic performance']},
+    {id:'eli',name:'ELI MORGAN',role:'FOUNDATIONS & MOBILITY',tag:'COACH 03',img:'https://images.unsplash.com/photo-1571019613914-85f342c55f55?auto=format&fit=crop&w=800&q=82',intro:'Simple explanations, useful feedback, and a patient approach to learning the movements.',specialties:['Training fundamentals','Mobility','Recovery habits']}
   ];
-  $('#coach-grid').innerHTML=coaches.map(c=>`<article class="coach-card"><div class="coach-portrait"><img src="${c.img}" alt="Stylized placeholder portrait for ${escapeHTML(c.name)}; not an actual gym coach" width="650" height="780" loading="lazy"><div class="coach-tag">ILLUSTRATIVE PROFILE / ${c.tag}</div></div><div class="coach-main"><h3>${c.name}<span class="copper-dot">.</span></h3><p>${c.role}</p><div class="coach-actions"><button type="button" data-coach-expand="${c.id}" aria-expanded="false" aria-controls="coach-details-${c.id}">MEET ${c.name.split(' ')[0]}</button><button type="button" data-coach-book="${c.id}">BOOK A SESSION ↗</button></div></div><div class="coach-details" id="coach-details-${c.id}" hidden><p>${c.intro}</p><span>SPECIALTIES</span><ul>${c.specialties.map(v=>`<li>${v}</li>`).join('')}</ul></div></article>`).join('');
+  $('#coach-grid').innerHTML=coaches.map(c=>`<article class="coach-card"><div class="coach-portrait"><img src="${c.img}" alt="Representative gym training photo accompanying a fictional ${escapeHTML(c.role.toLowerCase())} coach profile; not the named person" width="650" height="780" loading="lazy"><div class="coach-tag">CONCEPT COACH PROFILE / ${c.tag}</div></div><div class="coach-main"><h3>${c.name}<span class="copper-dot">.</span></h3><p>${c.role}</p><div class="coach-actions"><button type="button" data-coach-expand="${c.id}" aria-expanded="false" aria-controls="coach-details-${c.id}">MEET ${c.name.split(' ')[0]}</button><button type="button" data-coach-book="${c.id}">BOOK A SESSION ↗</button></div></div><div class="coach-details" id="coach-details-${c.id}" hidden><p>${c.intro}</p><span>SPECIALTIES</span><ul>${c.specialties.map(v=>`<li>${v}</li>`).join('')}</ul></div></article>`).join('');
+  $$('.coach-portrait img').forEach(image=>image.addEventListener('error',()=>{image.onerror=null;image.src='assets/coach-1.svg';}));
   $$('[data-coach-expand]').forEach(btn=>btn.addEventListener('click',()=>{
     const details=$('#coach-details-'+btn.dataset.coachExpand),open=details.hidden;details.hidden=!open;btn.setAttribute('aria-expanded',String(open));btn.textContent=open?'CLOSE DETAILS':'MEET '+coaches.find(c=>c.id===btn.dataset.coachExpand).name.split(' ')[0];
   }));
@@ -505,7 +381,7 @@
   if ($('#faq-list')) {
   /* 13. FAQ — NATIVE KEYBOARD-ACCESSIBLE DETAILS */
   const faqs=[
-    ['Do I need experience to join?','No experience is required for the intended Iron Gym concept. The program finder and first-visit guide are designed to make getting started less intimidating. Verify actual coaching availability before publishing.'],
+    ['Do I need experience to join?','No experience is required for the intended Iron Gym concept. The first-visit guide and photo tour are designed to make getting started less intimidating. Verify actual coaching availability before publishing.'],
     ['Can I train without taking classes?','Yes, in this proposed membership structure, Open Gym provides independent training access. Confirm final operating policies and staffed hours with the gym.'],
     ['Are the prices displayed here final?','No. All memberships, discounts and inclusions shown are example data for this website prototype. The gym owner must provide real fees, commitments and cancellation terms.'],
     ['Is the gym capacity display live?','Not yet. The meter intentionally uses simulated demand by time of day. It is labeled as a demonstration and can be connected to a secure occupancy data source later.'],
