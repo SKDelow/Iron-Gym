@@ -32,3 +32,7 @@ To launch for a real gym: confirm business identity, location, prices, class ros
 
 ## AI-generated visual assets (portfolio concept)
 Ten locally hosted WebP images in `assets/` were generated specifically for this demonstration. They include three fictional coach portraits with Iron Fitness-branded polo shirts, and seven gym interiors/training views designed to appear as one consistent fictional gym. Images are illustrative; the gym, staff identities, services, and business contact details are not verified as real. Do not represent the portraits as actual staff photographs.
+
+
+## Forged motion system
+Cross-page transitions use a short, non-blocking copper progress stroke, with a gentle arrival animation and a bfcache-safe return state. Fine-pointer visitors get subtle magnetic CTA feedback and spotlighted photo cards. A hand-authored barbell/rack outline draws in the desktop hero. The existing IntersectionObserver reveal system adds one-time photo lifts. All enhancements disable gracefully under `prefers-reduced-motion`, and touch users retain native scrolling/swiping. No additional JS or animation libraries.

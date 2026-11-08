@@ -747,3 +747,66 @@ body[data-page="visit"] .inner-hero{background:linear-gradient(100deg,#0b1010f0,
 @media(prefers-reduced-motion:reduce){
  .footer-nav-grid a,.footer-visit>a{transition:none}
 }
+
+
+/* ===========================================================
+   FORGED CINEMATIC MOTION  /  UI POLISH
+   Progressive enhancement: no navigation spinners or blocking assets.
+   =========================================================== */
+body.cinema-enter::after,
+body.cinema-leaving::after{
+  content:"";position:fixed;top:0;left:0;width:100%;height:3px;
+  background:linear-gradient(90deg,#713923,var(--copper-bright),#f1d0a6);
+  transform-origin:left;pointer-events:none;z-index:130;
+}
+body.cinema-enter::after{animation:forge-entry-line .76s cubic-bezier(.2,.75,.2,1) both}
+body.cinema-leaving::after{animation:forge-exit-line .23s ease-out both}
+body.cinema-enter main>:first-child{animation:forge-page-enter .72s cubic-bezier(.16,1,.3,1) both}
+body.cinema-leaving main,body.cinema-leaving .site-footer{
+  opacity:.66;transform:translateY(-6px);transition:opacity .18s ease,transform .18s ease;
+}
+@keyframes forge-entry-line{0%{transform:scaleX(0);opacity:1}80%{transform:scaleX(1);opacity:1}100%{transform:scaleX(1);opacity:0}}
+@keyframes forge-exit-line{from{transform:scaleX(0)}to{transform:scaleX(1)}}
+@keyframes forge-page-enter{from{opacity:.72;transform:translateY(9px)}to{opacity:1;transform:translateY(0)}}
+
+/* Animate the stroke, not a big video or canvas scene. */
+.cinema-rack-drawing{position:absolute;right:4%;top:11%;width:min(36vw,520px);height:auto;
+  color:#d08c69;stroke:currentColor;stroke-width:1.35;stroke-linecap:round;
+  opacity:.19;z-index:1;pointer-events:none;filter:drop-shadow(0 0 14px #a05d3c55)}
+.cinema-rack-drawing path{stroke-dasharray:2400;stroke-dashoffset:2400;
+  animation:forge-draw-rack 2.4s .25s cubic-bezier(.2,.65,.2,1) both}
+.cinema-rack-drawing path:nth-child(2){animation-delay:.43s}
+@keyframes forge-draw-rack{to{stroke-dashoffset:0}}
+
+/* Short-range button attraction for fine-pointer devices only. */
+.cinema-magnetic{transform:translate3d(var(--magnet-x,0px),var(--magnet-y,0px),0);
+  transition:transform .2s cubic-bezier(.2,.7,.2,1),background .2s,color .2s}
+.cinema-magnetic:hover:not(:disabled){transform:translate3d(var(--magnet-x,0px),calc(var(--magnet-y,0px) - 1px),0)}
+.cinema-magnetic:focus-visible{transform:none}
+/* A small light sheen adds depth without obscuring copy or replacing hover outlines. */
+.home-portal-card.cinema-spotlight::after{
+  content:"";position:absolute;inset:0;pointer-events:none;z-index:0;
+  background:radial-gradient(circle 170px at var(--spot-x,50%) var(--spot-y,50%),#e996512d,transparent 78%);
+  opacity:0;transition:opacity .2s ease;
+}
+.home-portal-card.cinema-spotlight:hover::after,.home-portal-card.cinema-spotlight:focus-visible::after{opacity:1}
+.home-portal-card.cinema-spotlight>*{position:relative;z-index:1}
+.home-portal-card.cinema-spotlight>img{position:absolute;z-index:-2}
+
+/* Lazy photographic elevation: small, composited changes only. */
+.cinema-photo img{will-change:transform;transition:transform .85s cubic-bezier(.18,.7,.25,1),opacity .7s ease,filter .45s}
+.cinema-photo:not(.cinema-photo-visible) img{opacity:.78;transform:scale(1.035)}
+.cinema-photo-visible img{opacity:1}
+@media (max-width:760px){
+  .cinema-rack-drawing{display:none}
+  body.cinema-leaving main,body.cinema-leaving .site-footer{transform:none}
+  .cinema-magnetic,.cinema-magnetic:hover:not(:disabled){transform:none}
+}
+@media (prefers-reduced-motion:reduce){
+  body.cinema-enter::after,body.cinema-leaving::after{display:none}
+  body.cinema-enter main>:first-child{animation:none}
+  body.cinema-leaving main,body.cinema-leaving .site-footer{opacity:1;transform:none;transition:none}
+  .cinema-rack-drawing path{stroke-dashoffset:0;animation:none}
+  .cinema-magnetic,.cinema-magnetic:hover:not(:disabled){transform:none!important;transition:none}
+  .cinema-photo img,.home-portal-card.cinema-spotlight::after{transition:none;transform:none!important;opacity:1}
+}

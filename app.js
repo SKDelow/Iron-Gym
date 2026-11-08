@@ -576,4 +576,81 @@
     renderTour(0);
   }
 
+
+  /* 16. FORGED MOTION SYSTEM — small, intentional, progressive enhancement.
+     Fast page transitions, hover-only magnetism and image reveals. No library,
+     blocking loader, audio, scroll hijacking or reliance on animation to navigate. */
+  if (!reduceMotion) {
+    document.body.classList.add('cinema-enter');
+
+    // A short exit treatment only for real same-origin HTML page navigation.
+    // Anchors, menu toggles, downloads, external links and browser back stay native.
+    let navigating = false;
+    document.addEventListener('click', (event) => {
+      if (navigating || event.defaultPrevented || event.button !== 0 ||
+          event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
+      const link = event.target.closest('a[href]');
+      if (!link || link.hasAttribute('download') || link.hasAttribute('data-no-transition') ||
+          (link.target && link.target !== '_self')) return;
+      const next = new URL(link.href, location.href);
+      if (next.origin !== location.origin || !['http:', 'https:'].includes(next.protocol)) return;
+      if (!(/\/$/.test(next.pathname) || /\.html$/i.test(next.pathname))) return;
+      if (next.pathname === location.pathname && next.search === location.search) return;
+      event.preventDefault();
+      navigating = true;
+      document.body.classList.add('cinema-leaving');
+      window.setTimeout(() => { location.assign(next.href); }, 185);
+    });
+    // Browser back-forward cache must never restore a faded-out page.
+    window.addEventListener('pageshow', () => {
+      navigating = false;
+      document.body.classList.remove('cinema-leaving');
+    });
+
+    // Use the actual pointer position for subtle optical attraction. Never on touch.
+    if (window.matchMedia('(hover: hover) and (pointer: fine)').matches) {
+      $$('.button, .header-pass, .footer-visit > a').forEach(target => {
+        target.classList.add('cinema-magnetic');
+        target.addEventListener('pointermove', event => {
+          const box = target.getBoundingClientRect();
+          const dx = (event.clientX - (box.left + box.width / 2)) / box.width;
+          const dy = (event.clientY - (box.top + box.height / 2)) / box.height;
+          target.style.setProperty('--magnet-x', `${Math.round(dx * 11)}px`);
+          target.style.setProperty('--magnet-y', `${Math.round(dy * 10)}px`);
+        }, {passive:true});
+        const release = () => {
+          target.style.removeProperty('--magnet-x');
+          target.style.removeProperty('--magnet-y');
+        };
+        target.addEventListener('pointerleave', release, {passive:true});
+        target.addEventListener('blur', release);
+      });
+
+      // Copper highlight follows the cursor over featured photographic cards.
+      $$('.home-portal-card').forEach(card => {
+        card.classList.add('cinema-spotlight');
+        card.addEventListener('pointermove', event => {
+          const box=card.getBoundingClientRect();
+          card.style.setProperty('--spot-x', `${((event.clientX-box.left)/box.width*100).toFixed(1)}%`);
+          card.style.setProperty('--spot-y', `${((event.clientY-box.top)/box.height*100).toFixed(1)}%`);
+        }, {passive:true});
+      });
+    }
+
+    // Photographs lift into place exactly once as they enter the viewport.
+    const frames = $$('.home-portal-card, .photo-card, .gallery-shot, .standard-visual, .coach-card');
+    frames.forEach(frame => frame.classList.add('cinema-photo'));
+    if ('IntersectionObserver' in window) {
+      const photoObserver = new IntersectionObserver(entries => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('cinema-photo-visible');
+            photoObserver.unobserve(entry.target);
+          }
+        });
+      }, {threshold:.13,rootMargin:'0px 0px -22px 0px'});
+      frames.forEach(frame => photoObserver.observe(frame));
+    } else frames.forEach(frame => frame.classList.add('cinema-photo-visible'));
+  }
+
 })();
