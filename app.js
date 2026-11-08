@@ -166,6 +166,12 @@
     return {plan,classType,reason};
   }
   function renderQuiz() {
+    $$('[data-quiz-marker]').forEach((marker,i)=>{
+      marker.classList.toggle('is-current',!quiz.complete && i===quiz.index);
+      marker.classList.toggle('is-complete',quiz.complete || i<quiz.index);
+      if(!quiz.complete && i===quiz.index)marker.setAttribute('aria-current','step');
+      else marker.removeAttribute('aria-current');
+    });
     quizProgressFill.style.width = `${quiz.complete ? 100 : (quiz.index+1)/questions.length*100}%`;
     quizProgressText.textContent = quiz.complete?'YOUR TRAINING MATCH':`QUESTION ${String(quiz.index+1).padStart(2,'0')} / 05`;
     quizBack.hidden = quiz.index===0 && !quiz.complete;
@@ -369,9 +375,27 @@
     $('#forecast-bars').innerHTML=Array.from({length:7},(_,i)=>{
       const h=(hour+i)%24,capacity=capacityForHour(h),level=capacity<40?'low':capacity<70?'mid':'high';
       const label=i===0?'NOW':(h%12||12)+(h>=12?'PM':'AM');
-      return `<div class="forecast-bar" data-level="${level}" title="${label}: simulated ${capacity}%"><span class="bar" style="height:${Math.max(6,capacity)}%"></span><small>${label}</small></div>`;
+      return `<button type="button" class="forecast-bar" data-level="${level}" data-hour="${h}" aria-pressed="${i===0}" aria-label="${label}: ${capacity} percent, simulated forecast"><span class="bar" style="height:${Math.max(6,capacity)}%"></span><small>${label}</small></button>`;
     }).join('');
+    selectForecastHour(hour);
   }
+  function selectForecastHour(hour){
+    const occupancy=capacityForHour(hour), level=levelLabel(occupancy);
+    const label=hour===localGymHour()?'CURRENT HOUR':`${String(hour%12||12)} ${hour>=12?'PM':'AM'}`;
+    $$('.forecast-bar').forEach(b=>{
+      const selected=Number(b.dataset.hour)===hour;
+      b.classList.toggle('is-selected',selected);
+      b.setAttribute('aria-pressed',String(selected));
+    });
+    const insight=$('#forecast-insight');
+    if(insight){insight.querySelector('span').textContent=label+' / SIMULATED';
+      insight.querySelector('strong').textContent=occupancy+'% modeled occupancy · '+level;
+      insight.querySelector('small').textContent='Illustrative demand profile, not a live crowd prediction.';}
+  }
+  $('#forecast-bars').addEventListener('click',event=>{
+    const button=event.target.closest('.forecast-bar');
+    if(button)selectForecastHour(Number(button.dataset.hour));
+  });
   async function updateCapacity(){
     const endpoint=cfg.integrations?.occupancyEndpoint;
     if(endpoint){

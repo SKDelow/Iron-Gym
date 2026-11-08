@@ -533,3 +533,63 @@ button:disabled{cursor:not-allowed;opacity:.43}
  .home-feature-art{min-height:250px}.gateway-card{min-height:220px}
 }
 @media(prefers-reduced-motion:reduce){.gateway-card:hover{transform:none}}
+
+
+/* -----------------------------------------------------------
+   EDITORIAL DESIGN UPDATE / 2026
+   Depo-inspired composition, precision marks & tactile surfaces.
+   All artwork is authored specifically for IRON GYM.
+   ----------------------------------------------------------- */
+.gateway-grid{grid-template-columns:minmax(0,1.18fr) minmax(0,.82fr);grid-template-rows:repeat(2,minmax(226px,1fr));gap:13px}
+.gateway-card{position:relative;isolation:isolate;min-height:226px;overflow:hidden;border:1px solid #404a47;border-top:2px solid #5b6661;box-shadow:0 15px 36px #0e11101a;transition:transform .28s var(--ease),background .25s,border-color .25s,box-shadow .28s}
+.gateway-card-featured{grid-row:span 2;min-height:485px;padding:clamp(27px,3.4vw,47px);background:radial-gradient(ellipse at 88% 15%,#59605a3a 0,transparent 48%),linear-gradient(135deg,#222a29,#111616)}
+.gateway-card-classes{background:linear-gradient(135deg,#24302e,#171f20)}
+.gateway-card-memberships{background:linear-gradient(135deg,#24292b,#1b1f20)}
+.gateway-card::before{content:attr(data-index);pointer-events:none;position:absolute;right:22px;bottom:-55px;font:900 clamp(160px,17vw,290px)/.9 var(--display);letter-spacing:-.06em;color:transparent;-webkit-text-stroke:1px #89928a20;z-index:-1}
+.gateway-card::after{content:'';pointer-events:none;position:absolute;top:0;right:-30%;width:65%;height:1px;background:linear-gradient(90deg,transparent,#e7a57d 45%,transparent);opacity:0;transform:rotate(-18deg);transition:opacity .35s}
+.gateway-card:hover::after,.gateway-card:focus-visible::after{opacity:.85}
+.gateway-card:hover,.gateway-card:focus-visible{box-shadow:0 20px 40px #0e111035;border-color:#d38a5a;transform:translateY(-3px)}
+.gateway-card-featured .gateway-top svg{width:54px;height:54px}
+.gateway-card-featured strong{font-size:clamp(58px,6.7vw,105px);line-height:.82;margin-top:auto;max-width:390px;position:relative;letter-spacing:-.012em}
+.gateway-card-featured>p{font-size:14px;max-width:290px;position:relative}
+.gateway-card-classes strong,.gateway-card-memberships strong{font-size:clamp(38px,3.7vw,58px);margin-top:22px;max-width:330px;position:relative}
+.gateway-card>p{position:relative;margin-bottom:24px}
+.gateway-bottom{position:relative;z-index:1}
+.gateway-card-featured .gateway-bottom{padding-top:23px}
+/* The same five-step quiz, with a more readable wayfinding system. */
+.quiz-milestones{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:4px;margin-top:24px}
+.quiz-milestone{min-width:0;display:flex;align-items:center;gap:8px;padding:11px 8px;border-top:1px solid #49524c;color:#7f8e85;transition:color .22s,border-color .22s,background .22s}
+.quiz-milestone i{font:800 21px/1 var(--display);font-style:normal;color:inherit}
+.quiz-milestone b{font:800 9px/1.2 var(--body);letter-spacing:.07em}
+.quiz-milestone.is-complete{border-color:#86654e;color:#d2a489}
+.quiz-milestone.is-current{border-color:var(--copper);background:#c76a4216;color:#f2e4d6}
+/* Tactile chart controls: users inspect hours instead of guessing from decorative bars. */
+.forecast-bar{border:0;background:transparent;border-bottom:2px solid transparent;padding:0 0 7px;color:#a8b6ae;cursor:pointer;transition:background .2s,border-color .2s,transform .2s}
+.forecast-bar.is-selected{border-color:var(--copper);background:#c76a4212}
+.forecast-bar:hover,.forecast-bar:focus-visible{background:#e18c5e13;transform:translateY(-2px)}
+.forecast-bar.is-selected small{color:#f0ede5}
+.forecast-insight{margin-top:16px;border-left:2px solid var(--copper);background:linear-gradient(90deg,#2b3431,#1a2020);padding:13px 15px;display:flex;flex-direction:column;gap:4px}
+.forecast-insight span{font-size:9px;letter-spacing:.12em;font-weight:800;color:var(--copper-bright)}
+.forecast-insight strong{font:800 24px/1.08 var(--display);text-transform:uppercase}
+.forecast-insight small{color:#acbab0;font-size:10px;line-height:1.5}
+@media(max-width:900px){
+ .gateway-grid{grid-template-columns:minmax(0,1fr) minmax(0,1fr);grid-template-rows:repeat(2,minmax(238px,1fr))}
+ .gateway-card-featured{grid-column:span 2;grid-row:auto;min-height:330px}
+ .gateway-card-featured strong{font-size:clamp(55px,8vw,89px)}
+}
+@media(max-width:760px){
+ .gateway-grid{grid-template-columns:minmax(0,1fr);grid-template-rows:none;gap:10px}
+ .gateway-card,.gateway-card-featured{grid-column:auto;grid-row:auto;min-height:215px;padding:22px}
+ .gateway-card-featured{min-height:280px}
+ .gateway-card-featured strong{font-size:clamp(51px,12vw,74px);margin-top:30px}
+ .gateway-card-classes strong,.gateway-card-memberships strong{font-size:clamp(36px,10vw,53px)}
+ .gateway-card:before{font-size:170px;bottom:-28px}
+ .quiz-milestones{gap:2px}
+ .quiz-milestone{display:flex;flex-direction:column;align-items:flex-start;gap:5px;padding:9px 4px}
+ .quiz-milestone i{font-size:18px}
+ .quiz-milestone b{font-size:8px;letter-spacing:0}
+}
+@media(prefers-reduced-motion:reduce){
+ .gateway-card,.gateway-card::after,.quiz-milestone,.forecast-bar{transition:none!important}
+ .gateway-card:hover,.gateway-card:focus-visible,.forecast-bar:hover,.forecast-bar:focus-visible{transform:none}
+}

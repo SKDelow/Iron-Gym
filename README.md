@@ -122,3 +122,9 @@ This iteration incorporates select concepts from the Lovable 2026 design-trends 
 The Program Finder now includes an **optional** “Save my starting point” control. It stores only the recommended plan and training category in local browser storage (never quiz answers, email, or behavioral history), shows a returning-visitor reminder, and supports one-click clearing. It makes no server requests.
 
 Reference: https://lovable.dev/guides/website-design-trends-2026
+
+### Editorial design refinement (November 2026)
+- Bespoke modular gateway layout: oversized first card, stepped companion cards, precision-marked industrial surfaces.
+- Program Finder: accessible five-stage milestone rail synchronized to the existing quiz.
+- Classes: keyboard-operable hourly forecast selector that clearly identifies all forecast data as simulated. No new dependencies.
+- Reference: Eleken 2026 best website design examples (ideas and UX principles only; no source graphics copied).
