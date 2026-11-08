@@ -22,27 +22,45 @@
   /* 1. BRAND CONFIG, LOCATION + SEARCH METADATA */
   const locationLabel = `${cfg.city || 'CITY'}, ${cfg.state || 'STATE'}`;
   $$('.js-city').forEach(el => el.textContent = locationLabel);
-  $('#footer-address').textContent = `${cfg.streetAddress ? cfg.streetAddress+'\n'+locationLabel+(cfg.postalCode ? ' '+cfg.postalCode : '') : 'LOCATION DETAILS COMING SOON'}`;
-  $('#footer-address').style.whiteSpace = 'pre-line';
-  $('#footer-hours').textContent = cfg.openingHoursDisplay && cfg.openingHoursDisplay !== 'HOURS TO BE CONFIRMED' ? cfg.openingHoursDisplay : 'HOURS WILL BE POSTED SOON';
-  $('#copyright-year').textContent = new Date().getFullYear();
-  if (cfg.streetAddress && cfg.city && cfg.state && cfg.city !== 'CITY') {
-    const map = $('#map-container');
-    const place = [cfg.streetAddress,cfg.city,cfg.state,cfg.postalCode].filter(Boolean).join(', ');
-    const frame = document.createElement('iframe');
-    frame.src = `https://maps.google.com/maps?q=${encodeURIComponent(place)}&output=embed`;
-    frame.title = `Map to ${cfg.name} at ${place}`;
-    frame.loading = 'lazy'; frame.referrerPolicy = 'no-referrer-when-downgrade';
-    map.replaceChildren(frame); map.classList.add('has-map');
+  /* Show only verified contact and social information. Never fill the footer
+     with fictional addresses, empty map frames, or links to nowhere. */
+  const footerExtra = $('#footer-extra');
+  const footerLocation = $('#footer-location');
+  const footerSocial = $('#footer-social');
+  const knownAddress = !!(cfg.streetAddress && cfg.city && cfg.state &&
+    cfg.city !== 'CITY' && cfg.state !== 'STATE');
+  const knownHours = !!(cfg.openingHoursDisplay &&
+    cfg.openingHoursDisplay !== 'HOURS TO BE CONFIRMED');
+  const locationLine = [cfg.streetAddress, cfg.city, cfg.state, cfg.postalCode]
+    .filter(Boolean).join(', ');
+  if (knownAddress || knownHours) {
+    footerLocation.hidden = false;
+    if (knownAddress) {
+      $('#footer-address').textContent = locationLine;
+      const map = $('#map-container');
+      const frame = document.createElement('iframe');
+      frame.src = `https://maps.google.com/maps?q=${encodeURIComponent(locationLine)}&output=embed`;
+      frame.title = `Map to ${cfg.name || 'Iron Gym'}`;
+      frame.loading = 'lazy';
+      frame.referrerPolicy = 'no-referrer-when-downgrade';
+      map.replaceChildren(frame);
+      map.hidden = false;
+    } else $('#footer-address').hidden = true;
+    if (knownHours) $('#footer-hours').textContent = cfg.openingHoursDisplay;
+    else $('#footer-hours').hidden = true;
   }
   Object.entries(cfg.socialLinks || {}).forEach(([network,url]) => {
     if (!/^https:\/\//i.test(url || '')) return;
-    const placeholder = $$('.footer-placeholder').find(el => el.textContent.startsWith(network.toUpperCase()));
-    if(placeholder) {
-      const a = document.createElement('a'); a.href = url; a.target = '_blank';a.rel='noopener noreferrer';
-      a.textContent = network.toUpperCase() + ' ↗'; placeholder.replaceWith(a);
-    }
+    const link = document.createElement('a');
+    link.href = url;
+    link.target = '_blank';
+    link.rel = 'noopener noreferrer';
+    link.textContent = `${network.toUpperCase()} ↗`;
+    $('#footer-social-links').appendChild(link);
+    footerSocial.hidden = false;
   });
+  footerExtra.hidden = footerLocation.hidden && footerSocial.hidden;
+  $('#copyright-year').textContent = new Date().getFullYear();
   // Only publish meaningful LocalBusiness structured data when the address is real.
   if (cfg.streetAddress && cfg.city !== 'CITY' && cfg.state !== 'STATE') {
     const schema = {'@context':'https://schema.org','@type':'ExerciseGym',name:cfg.name || 'IRON GYM',description:'Strength training, classes and coaching in a focused gym environment.',address:{'@type':'PostalAddress',streetAddress:cfg.streetAddress,addressLocality:cfg.city,addressRegion:cfg.state,postalCode:cfg.postalCode || undefined,addressCountry:'US'}};
