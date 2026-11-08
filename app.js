@@ -585,4 +585,80 @@
   $('#pass-again').addEventListener('click',()=>{passForm.reset();$$('.field-error').forEach(e=>e.textContent='');$$('[aria-invalid]',passForm).forEach(e=>e.removeAttribute('aria-invalid'));passForm.hidden=false;success.hidden=true;dateField.min=todayISO();$('#pass-name').focus();});
   }
 
+  /* 15. CONCEPT GYM PHOTO TOUR — MANUAL, ACCESSIBLE GALLERY */
+  if ($('#photo-tour')) {
+    const zones = [
+      {
+        label: 'THE STRENGTH FLOOR',
+        name: 'THE STRENGTH FLOOR',
+        image: 'https://images.unsplash.com/photo-1545612036-2872840642dc?auto=format&fit=crop&w=1800&q=82',
+        alt: 'Real strength gym interior with barbells and lifting platforms',
+        copy: 'A place for focused work: sturdy equipment, room to move and no distractions from the next set.',
+        features: ['BARBELLS', 'PLATFORMS', 'TRAINING SPACE']
+      },
+      {
+        label: 'RACK ROW',
+        name: 'THE RACK ROW',
+        image: 'https://images.unsplash.com/photo-1784798228092-659924b1a15b?auto=format&fit=crop&w=1800&q=82',
+        alt: 'Real gym with an empty squat rack, barbells and weight plates',
+        copy: 'Where the big lifts happen. From a comfortable first squat to your next strong personal record.',
+        features: ['SQUAT RACKS', 'PLATES', 'STRENGTH WORK']
+      },
+      {
+        label: 'FREE WEIGHTS',
+        name: 'THE FREE-WEIGHT AREA',
+        image: 'https://images.unsplash.com/photo-1534438327276-14e5300c3a48?auto=format&fit=crop&w=1800&q=82',
+        alt: 'Rows of dumbbells and members training in a real gym',
+        copy: 'Grab a pair, find your bench and get on with it. The essentials should always be close at hand.',
+        features: ['DUMBBELLS', 'BENCHES', 'ACCESSORY WORK']
+      },
+      {
+        label: 'CONDITIONING',
+        name: 'THE CONDITIONING ZONE',
+        image: 'https://images.unsplash.com/photo-1540497077202-7c8a3999166f?auto=format&fit=crop&w=1800&q=82',
+        alt: 'Real fitness studio with cardio equipment and training machines',
+        copy: 'Strength is the foundation, not the finish line. Make room to build a stronger engine, too.',
+        features: ['CARDIO', 'ENDURANCE', 'MOVEMENT']
+      },
+      {
+        label: 'THE DETAILS',
+        name: 'THE DETAILS MATTER',
+        image: 'https://images.unsplash.com/photo-1583454110551-21f2fa2afe61?auto=format&fit=crop&w=1800&q=82',
+        alt: 'Close-up real gym photo of a member gripping a heavy dumbbell',
+        copy: 'The feel of the grip. The weight in your hand. A space that lets the work speak for itself.',
+        features: ['FOCUS', 'EQUIPMENT', 'THE WORK']
+      }
+    ];
+    const photo=$('#tour-photo'), position=$('#tour-position'), stageNumber=$('#tour-stage-index');
+    const steps=$$('.tour-step');
+    let current=0;
+    const preload=zones.map(z => { const img=new Image();img.src=z.image;return img; });
+    const renderTour=(idx,shouldFocus=false)=>{
+      current=(idx+zones.length)%zones.length;
+      const z=zones[current],number=pad(current+1);
+      photo.src=z.image;photo.alt=z.alt;
+      $('#tour-photo-label').textContent=z.label;
+      $('#tour-photo-counter').textContent=`${number} / ${pad(zones.length)}`;
+      stageNumber.textContent=number;position.textContent=number;
+      $('#tour-name').innerHTML=escapeHTML(z.name)+'<span>.</span>';
+      $('#tour-copy').textContent=z.copy;
+      $('#tour-features').replaceChildren(...z.features.map(value=>{const el=document.createElement('span');el.textContent=value;return el;}));
+      steps.forEach((button,i)=>{const active=i===current;button.classList.toggle('is-active',active);button.setAttribute('aria-pressed',String(active));});
+      if(shouldFocus)steps[current].focus({preventScroll:true});
+      announce(`${z.name}. Photo ${current+1} of ${zones.length}. ${z.copy}`);
+    };
+    $('#tour-prev').addEventListener('click',()=>renderTour(current-1));
+    $('#tour-next').addEventListener('click',()=>renderTour(current+1));
+    steps.forEach(button=>button.addEventListener('click',()=>renderTour(Number(button.dataset.tourZone))));
+    $('#photo-tour').addEventListener('keydown',event=>{
+      if(event.target.matches('.tour-step')) {
+        if(event.key==='ArrowRight' || event.key==='ArrowDown') {event.preventDefault();renderTour(Number(event.target.dataset.tourZone)+1,true);}
+        if(event.key==='ArrowLeft' || event.key==='ArrowUp') {event.preventDefault();renderTour(Number(event.target.dataset.tourZone)-1,true);}
+      }
+    });
+    // If a remote image cannot load, use a locally shipped gym illustration instead of a broken image icon.
+    photo.addEventListener('error',()=>{if(!photo.src.endsWith('/assets/training-room.svg'))photo.src='assets/training-room.svg';});
+    renderTour(0);
+  }
+
 })();

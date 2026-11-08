@@ -19,6 +19,7 @@ Iron Gym now uses seven dedicated pages instead of one long landing page. Each p
 | Page | Purpose |
 | --- | --- |
 | `index.html` | Short homepage, gateway cards, space introduction, first-visit CTA |
+| `tour.html` | Interactive five-stop real-photo tour; representative imagery, not an actual facility walkthrough |
 | `about.html` | Training philosophy, amenities, illustrative transformation slider and testimonials |
 | `programs.html` | Five-question Program Finder and optional saved recommendation |
 | `classes.html` | Filterable 20-session demo class schedule, calendar export and simulated capacity |
@@ -133,3 +134,11 @@ Reference: https://lovable.dev/guides/website-design-trends-2026
 ## Demo Photography
 - Added realistic gym imagery using remote Unsplash image URLs to help the portfolio piece feel like a real branded website.
 - Before using this as a real client build, replace demo images with licensed final photography owned or approved for the finished project.
+
+
+## Portfolio photo tour
+The photo tour uses real gym photographs from Unsplash under the standard Unsplash License, including photographs of identifiable real facilities. **This is a visual portfolio concept, not a factual walkthrough of an operating Iron Gym.** Do not misrepresent these venues as Iron Gym property. The UI explicitly labels the photos as representative.
+Photo references include:
+- Mirko Meister, *Empty gym with power rack, barbells, and weights* — https://unsplash.com/photos/j4T5z94b8ns
+- George Pagan III, *Gym equipment inside room* — https://unsplash.com/photos/iDJoeqe5Lug
+- Additional imagery from Unsplash, delivered by `images.unsplash.com`. Replace with location-accurate photos for a real launch.
