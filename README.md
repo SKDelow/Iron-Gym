@@ -128,3 +128,8 @@ Reference: https://lovable.dev/guides/website-design-trends-2026
 - Program Finder: accessible five-stage milestone rail synchronized to the existing quiz.
 - Classes: keyboard-operable hourly forecast selector that clearly identifies all forecast data as simulated. No new dependencies.
 - Reference: Eleken 2026 best website design examples (ideas and UX principles only; no source graphics copied).
+
+
+## Demo Photography
+- Added realistic gym imagery using remote Unsplash image URLs to help the portfolio piece feel like a real branded website.
+- Before using this as a real client build, replace demo images with licensed final photography owned or approved for the finished project.
