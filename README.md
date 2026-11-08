@@ -2,14 +2,14 @@
 
 A seven-page, mobile-first gym website concept in HTML, CSS and vanilla JavaScript.
 
-**Important:** Iron Gym is a *fictional portfolio brand*, not an operating fitness facility. The photography is representative imagery of actual gyms, not photographs of an Iron Gym location. Coach names and profiles, membership rates, testimonials and schedule data are fictional examples. No memberships, bookings or day-pass submissions are processed.
+**Important:** Iron Gym is a *fictional portfolio brand*, not an operating fitness facility. All current photography-like imagery is AI-generated and depicts a fictional gym, not an operating facility. Coach names and profiles, membership rates, testimonials and schedule data are fictional examples. No memberships, bookings or day-pass submissions are processed.
 
 ## Pages
 - `index.html` — concise photographic homepage; Tour → Classes/Memberships → First Visit
-- `tour.html` — interactive five-stop representative photo tour
+- `tour.html` — interactive five-stop AI-generated facility tour
 - `classes.html` — filterable sample class schedule and simulated crowd forecast
 - `memberships.html` — three example membership tiers, price toggle, effective-cost calculator and FAQ
-- `coaches.html` — illustrative coach profiles with representative training photos
+- `coaches.html` — illustrative coach profiles with AI-generated Iron Fitness polo portraits
 - `about.html` — facility details, illustrative amenity list, conceptual progress art and example quotes
 - `visit.html` — three-step roadmap, personalized first-visit guide and *non-submitting* pass preview
 
@@ -28,3 +28,7 @@ Images currently load from `images.unsplash.com` with consistent color grading i
 `config.js` holds placeholder city, address, hours, pricing, and integration settings. Simulated occupancy is labeled as such; all class sessions and staff profiles are demonstrations. The pass form is intentionally disabled from collecting information until a verified backend and privacy notice are supplied. Do not publish fake customer claims.
 
 To launch for a real gym: confirm business identity, location, prices, class roster, staff, policies, approved photography and reviews; wire secure booking and contact integrations; run real-device accessibility and performance QA.
+
+
+## AI-generated visual assets (portfolio concept)
+Ten locally hosted WebP images in `assets/` were generated specifically for this demonstration. They include three fictional coach portraits with Iron Fitness-branded polo shirts, and seven gym interiors/training views designed to appear as one consistent fictional gym. Images are illustrative; the gym, staff identities, services, and business contact details are not verified as real. Do not represent the portraits as actual staff photographs.

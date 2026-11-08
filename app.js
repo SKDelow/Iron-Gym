@@ -296,11 +296,11 @@
   const dialog=$('#booking-dialog');
   const showDialog=()=>{if(typeof dialog.showModal==='function')dialog.showModal();else dialog.setAttribute('open','');};
   const coaches=[
-    {id:'mara',name:'MARA REYES',role:'STRENGTH & TECHNIQUE',tag:'COACH 01',img:'https://images.unsplash.com/photo-1517838277536-f5f99be501cd?auto=format&fit=crop&w=800&q=82',intro:'Clear progressions, excellent form and the confidence to add weight when you are ready.',specialties:['Barbell lifting','Beginner strength','Movement quality']},
-    {id:'jalen',name:'JALEN PRICE',role:'CONDITIONING & PERFORMANCE',tag:'COACH 02',img:'https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?auto=format&fit=crop&w=800&q=82',intro:'Conditioning built around smart effort. Train hard, recover well, and keep showing up.',specialties:['Conditioning','Work capacity','Athletic performance']},
-    {id:'eli',name:'ELI MORGAN',role:'FOUNDATIONS & MOBILITY',tag:'COACH 03',img:'https://images.unsplash.com/photo-1571019613914-85f342c55f55?auto=format&fit=crop&w=800&q=82',intro:'Simple explanations, useful feedback, and a patient approach to learning the movements.',specialties:['Training fundamentals','Mobility','Recovery habits']}
+    {id:'mara',name:'MARA REYES',role:'STRENGTH & TECHNIQUE',tag:'COACH 01',img:'assets/coach-mara.webp',intro:'Clear progressions, excellent form and the confidence to add weight when you are ready.',specialties:['Barbell lifting','Beginner strength','Movement quality']},
+    {id:'jalen',name:'JALEN PRICE',role:'CONDITIONING & PERFORMANCE',tag:'COACH 02',img:'assets/coach-jalen.webp',intro:'Conditioning built around smart effort. Train hard, recover well, and keep showing up.',specialties:['Conditioning','Work capacity','Athletic performance']},
+    {id:'eli',name:'ELI MORGAN',role:'FOUNDATIONS & MOBILITY',tag:'COACH 03',img:'assets/coach-eli.webp',intro:'Simple explanations, useful feedback, and a patient approach to learning the movements.',specialties:['Training fundamentals','Mobility','Recovery habits']}
   ];
-  $('#coach-grid').innerHTML=coaches.map(c=>`<article class="coach-card"><div class="coach-portrait"><img src="${c.img}" alt="Representative gym training photo accompanying a fictional ${escapeHTML(c.role.toLowerCase())} coach profile; not the named person" width="650" height="780" loading="lazy"><div class="coach-tag">CONCEPT COACH PROFILE / ${c.tag}</div></div><div class="coach-main"><h3>${c.name}<span class="copper-dot">.</span></h3><p>${c.role}</p><div class="coach-actions"><button type="button" data-coach-expand="${c.id}" aria-expanded="false" aria-controls="coach-details-${c.id}">MEET ${c.name.split(' ')[0]}</button><button type="button" data-coach-book="${c.id}">BOOK A SESSION ↗</button></div></div><div class="coach-details" id="coach-details-${c.id}" hidden><p>${c.intro}</p><span>SPECIALTIES</span><ul>${c.specialties.map(v=>`<li>${v}</li>`).join('')}</ul></div></article>`).join('');
+  $('#coach-grid').innerHTML=coaches.map(c=>`<article class="coach-card"><div class="coach-portrait"><img src="${c.img}" alt="AI-generated portrait of fictional ${escapeHTML(c.role.toLowerCase())} coach wearing an Iron Fitness polo shirt" width="650" height="780" loading="lazy"><div class="coach-tag">CONCEPT COACH PROFILE / ${c.tag}</div></div><div class="coach-main"><h3>${c.name}<span class="copper-dot">.</span></h3><p>${c.role}</p><div class="coach-actions"><button type="button" data-coach-expand="${c.id}" aria-expanded="false" aria-controls="coach-details-${c.id}">MEET ${c.name.split(' ')[0]}</button><button type="button" data-coach-book="${c.id}">BOOK A SESSION ↗</button></div></div><div class="coach-details" id="coach-details-${c.id}" hidden><p>${c.intro}</p><span>SPECIALTIES</span><ul>${c.specialties.map(v=>`<li>${v}</li>`).join('')}</ul></div></article>`).join('');
   $$('.coach-portrait img').forEach(image=>image.addEventListener('error',()=>{image.onerror=null;image.src='assets/coach-1.svg';}));
   $$('[data-coach-expand]').forEach(btn=>btn.addEventListener('click',()=>{
     const details=$('#coach-details-'+btn.dataset.coachExpand),open=details.hidden;details.hidden=!open;btn.setAttribute('aria-expanded',String(open));btn.textContent=open?'CLOSE DETAILS':'MEET '+coaches.find(c=>c.id===btn.dataset.coachExpand).name.split(' ')[0];
@@ -467,7 +467,7 @@
       {
         label: 'THE STRENGTH FLOOR',
         name: 'THE STRENGTH FLOOR',
-        image: 'https://images.unsplash.com/photo-1545612036-2872840642dc?auto=format&fit=crop&w=1800&q=82',
+        image: 'assets/iron-floor.webp',
         alt: 'Real strength gym interior with barbells and lifting platforms',
         copy: 'A place for focused work: sturdy equipment, room to move and no distractions from the next set.',
         features: ['BARBELLS', 'PLATFORMS', 'TRAINING SPACE']
@@ -475,23 +475,23 @@
       {
         label: 'RACK ROW',
         name: 'THE RACK ROW',
-        image: 'https://images.unsplash.com/photo-1784798228092-659924b1a15b?auto=format&fit=crop&w=1800&q=82',
-        alt: 'Real gym with an empty squat rack, barbells and weight plates',
+        image: 'assets/iron-racks.webp',
+        alt: 'AI-generated industrial gym with an empty squat rack, barbells and weight plates',
         copy: 'Where the big lifts happen. From a comfortable first squat to your next strong personal record.',
         features: ['SQUAT RACKS', 'PLATES', 'STRENGTH WORK']
       },
       {
         label: 'FREE WEIGHTS',
         name: 'THE FREE-WEIGHT AREA',
-        image: 'https://images.unsplash.com/photo-1534438327276-14e5300c3a48?auto=format&fit=crop&w=1800&q=82',
-        alt: 'Rows of dumbbells and members training in a real gym',
+        image: 'assets/iron-weights.webp',
+        alt: 'AI-generated gym with rows of dumbbells and training benches',
         copy: 'Grab a pair, find your bench and get on with it. The essentials should always be close at hand.',
         features: ['DUMBBELLS', 'BENCHES', 'ACCESSORY WORK']
       },
       {
         label: 'CONDITIONING',
         name: 'THE CONDITIONING ZONE',
-        image: 'https://images.unsplash.com/photo-1540497077202-7c8a3999166f?auto=format&fit=crop&w=1800&q=82',
+        image: 'assets/iron-conditioning.webp',
         alt: 'Real fitness studio with cardio equipment and training machines',
         copy: 'Strength is the foundation, not the finish line. Make room to build a stronger engine, too.',
         features: ['CARDIO', 'ENDURANCE', 'MOVEMENT']
@@ -499,8 +499,8 @@
       {
         label: 'THE DETAILS',
         name: 'THE DETAILS MATTER',
-        image: 'https://images.unsplash.com/photo-1583454110551-21f2fa2afe61?auto=format&fit=crop&w=1800&q=82',
-        alt: 'Close-up real gym photo of a member gripping a heavy dumbbell',
+        image: 'assets/iron-dumbbells.webp',
+        alt: 'AI-generated premium gym with free weights and strength equipment',
         copy: 'The feel of the grip. The weight in your hand. A space that lets the work speak for itself.',
         features: ['FOCUS', 'EQUIPMENT', 'THE WORK']
       }
