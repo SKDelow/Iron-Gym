@@ -22,9 +22,9 @@
   /* 1. BRAND CONFIG, LOCATION + SEARCH METADATA */
   const locationLabel = `${cfg.city || 'CITY'}, ${cfg.state || 'STATE'}`;
   $$('.js-city').forEach(el => el.textContent = locationLabel);
-  $('#footer-address').textContent = `${cfg.streetAddress || 'ADDRESS TO BE CONFIRMED'}\n${locationLabel}${cfg.postalCode ? ' '+cfg.postalCode : ''}`;
+  $('#footer-address').textContent = `${cfg.streetAddress ? cfg.streetAddress+'\n'+locationLabel+(cfg.postalCode ? ' '+cfg.postalCode : '') : 'LOCATION DETAILS COMING SOON'}`;
   $('#footer-address').style.whiteSpace = 'pre-line';
-  $('#footer-hours').textContent = cfg.openingHoursDisplay || 'HOURS TO BE CONFIRMED';
+  $('#footer-hours').textContent = cfg.openingHoursDisplay && cfg.openingHoursDisplay !== 'HOURS TO BE CONFIRMED' ? cfg.openingHoursDisplay : 'HOURS WILL BE POSTED SOON';
   $('#copyright-year').textContent = new Date().getFullYear();
   if (cfg.streetAddress && cfg.city && cfg.state && cfg.city !== 'CITY') {
     const map = $('#map-container');
@@ -144,7 +144,7 @@
     if(!filtered.length){result.innerHTML='<div class="no-classes"><strong>NO MATCHES THIS TIME.</strong><p>Try a different day or training format.</p><button type="button" id="clear-empty">RESET FILTERS</button></div>';$('#clear-empty').addEventListener('click',resetFilters);return;}
     result.innerHTML=filtered.map(item=>{
       const [h,m]=item.time.split(':').map(Number);const hour=h%12||12,ampm=h>=12?'PM':'AM';
-      return `<article class="class-row"><div class="class-time">${hour}:${String(m).padStart(2,'0')}<small>${ampm} • ${item.day.slice(0,3).toUpperCase()}</small></div><div class="class-name"><div class="class-name-icon">${icon(classIcons[item.type])}</div><div><strong>${escapeHTML(item.title)}</strong><small>${escapeHTML(item.type)} • ${escapeHTML(item.duration)}</small></div></div><div class="class-coach">COACH ${escapeHTML(item.coach.toUpperCase())}<small>DEMO CLASS</small></div><span class="class-level" data-level="${escapeHTML(item.intensity)}">${escapeHTML(item.intensity.toUpperCase())}</span><button class="class-more" type="button" aria-label="Details for ${escapeHTML(item.title)} on ${item.day}" data-class-id="${item.id}">${icon('i-diagonal')}</button></article>`;
+      return `<article class="class-row"><div class="class-time">${hour}:${String(m).padStart(2,'0')}<small>${ampm} • ${item.day.slice(0,3).toUpperCase()}</small></div><div class="class-name"><div class="class-name-icon">${icon(classIcons[item.type])}</div><div><strong>${escapeHTML(item.title)}</strong><small>${escapeHTML(item.type)} • ${escapeHTML(item.duration)}</small></div></div><div class="class-coach">COACH ${escapeHTML(item.coach.toUpperCase())}<small>CLASS PREVIEW</small></div><span class="class-level" data-level="${escapeHTML(item.intensity)}">${escapeHTML(item.intensity.toUpperCase())}</span><button class="class-more" type="button" aria-label="Details for ${escapeHTML(item.title)} on ${item.day}" data-class-id="${item.id}">${icon('i-diagonal')}</button></article>`;
     }).join('');
     $$('[data-class-id]',result).forEach(btn=>btn.addEventListener('click',()=>openClass(schedule[Number(btn.dataset.classId)])));
   }
@@ -195,7 +195,7 @@
     $('#billing-annual').classList.toggle('is-active',billing==='annual');$('#billing-annual').setAttribute('aria-pressed',String(billing==='annual'));
     $('#plan-cards').innerHTML=Object.values(plans).map(plan=>{
       const annual=plan.price*annualMonths,savings=plan.price*12-annual,equivalent=annual/12;
-      return `<article class="plan-card ${plan.popular?'is-popular':''} "><div class="plan-top"><div class="plan-name"><h3>${escapeHTML(plan.name)}</h3>${plan.popular?'<span>MOST CHOSEN / DEMO</span>':''}</div><p class="plan-subtitle">${escapeHTML(plan.subtitle)}</p><div class="plan-price"><b>${billing==='monthly'?money(plan.price).replace('.00',''):money(equivalent)}</b><span>/MO</span></div><p class="plan-billing">${billing==='annual'?`BILLED ${money(annual)} / YEAR · SAVE ${money(savings)} VS MONTHLY`:'MONTH-TO-MONTH DEMO RATE · NO CONTRACT TERMS PROVIDED'}</p></div><div class="plan-features"><strong>WHAT'S INCLUDED</strong><ul>${plan.features.map(f=>`<li>${icon('i-check')}<span>${escapeHTML(f)}</span></li>`).join('')}</ul></div><div class="plan-bottom"><button type="button" class="button button-copper" data-choose-plan="${plan.key}">${plan.cta} ${icon('i-arrow')}</button><small>Sample pricing and benefits, not an offer.</small></div></article>`;
+      return `<article class="plan-card ${plan.popular?'is-popular':''} "><div class="plan-top"><div class="plan-name"><h3>${escapeHTML(plan.name)}</h3>${plan.popular?'<span>MOST CHOSEN</span>':''}</div><p class="plan-subtitle">${escapeHTML(plan.subtitle)}</p><div class="plan-price"><b>${billing==='monthly'?money(plan.price).replace('.00',''):money(equivalent)}</b><span>/MO</span></div><p class="plan-billing">${billing==='annual'?`BILLED ${money(annual)} / YEAR · SAVE ${money(savings)} VS MONTHLY`:'MONTH-TO-MONTH · TERMS TO BE CONFIRMED'}</p></div><div class="plan-features"><strong>WHAT'S INCLUDED</strong><ul>${plan.features.map(f=>`<li>${icon('i-check')}<span>${escapeHTML(f)}</span></li>`).join('')}</ul></div><div class="plan-bottom"><button type="button" class="button button-copper" data-choose-plan="${plan.key}">${plan.cta} ${icon('i-arrow')}</button><small>Rates and inclusions must be confirmed before joining.</small></div></article>`;
     }).join('');
     $$('[data-choose-plan]').forEach(btn=>btn.addEventListener('click',()=>selectPlan(btn.dataset.choosePlan)));
     renderValue();
@@ -216,7 +216,7 @@
     const perVisit=yearly/(52*visits);
     $('#visits-label').textContent=`${visits} ${visits===1?'DAY':'DAYS'} / WEEK`;
     $('#cost-per-visit').textContent=money(perVisit);
-    $('#calc-footnote').textContent=`Assumes ${52*visits} visits/year at ${billing} demo rates. No initiation fees included.`;
+    $('#calc-footnote').textContent=`Assumes ${52*visits} visits/year at ${billing} listed rates. Initiation fees are not included.`;
     const pct=(visits-1)/6*100;
     $('#visits-slider').style.background=`linear-gradient(90deg,var(--copper) 0 ${pct}%,#b9c2b5 ${pct}% 100%)`;
   }
@@ -241,7 +241,7 @@
     const max=Number(cfg.capacities?.total)||100;
     $('#capacity-people').textContent=`${people ?? Math.round(max*value/100)} / ${max} modeled spots in use`;
     $('#capacity-timestamp').textContent=`UPDATED ${new Date().toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit'})}`;
-    $('.simulation-pulse').innerHTML=`<i></i> ${real?'API-CONNECTED DATA':'DEMO DATA'}`;
+    $('.simulation-pulse').innerHTML=`<i></i> ${real?'API-CONNECTED DATA':'ESTIMATE'}`;
     $('.capacity-card-top>span:first-child').textContent=real?'FLOOR ACTIVITY / CONNECTED':'FLOOR ACTIVITY / SIMULATION';
     $('.capacity-note').textContent=real?'Occupancy provided by your configured endpoint. Confirm data accuracy with the sensor operator.':'Not real-time. Values are illustrative until a verified occupancy API is connected.';
   }
@@ -300,14 +300,14 @@
     {id:'jalen',name:'JALEN PRICE',role:'CONDITIONING & PERFORMANCE',tag:'COACH 02',img:'assets/coach-jalen.webp',intro:'Conditioning built around smart effort. Train hard, recover well, and keep showing up.',specialties:['Conditioning','Work capacity','Athletic performance']},
     {id:'eli',name:'ELI MORGAN',role:'FOUNDATIONS & MOBILITY',tag:'COACH 03',img:'assets/coach-eli.webp',intro:'Simple explanations, useful feedback, and a patient approach to learning the movements.',specialties:['Training fundamentals','Mobility','Recovery habits']}
   ];
-  $('#coach-grid').innerHTML=coaches.map(c=>`<article class="coach-card"><div class="coach-portrait"><img src="${c.img}" alt="AI-generated portrait of fictional ${escapeHTML(c.role.toLowerCase())} coach wearing an Iron Fitness polo shirt" width="650" height="780" loading="lazy"><div class="coach-tag">CONCEPT COACH PROFILE / ${c.tag}</div></div><div class="coach-main"><h3>${c.name}<span class="copper-dot">.</span></h3><p>${c.role}</p><div class="coach-actions"><button type="button" data-coach-expand="${c.id}" aria-expanded="false" aria-controls="coach-details-${c.id}">MEET ${c.name.split(' ')[0]}</button><button type="button" data-coach-book="${c.id}">BOOK A SESSION ↗</button></div></div><div class="coach-details" id="coach-details-${c.id}" hidden><p>${c.intro}</p><span>SPECIALTIES</span><ul>${c.specialties.map(v=>`<li>${v}</li>`).join('')}</ul></div></article>`).join('');
+  $('#coach-grid').innerHTML=coaches.map(c=>`<article class="coach-card"><div class="coach-portrait"><img src="${c.img}" alt="Coach portrait wearing an Iron Fitness polo shirt" width="650" height="780" loading="lazy"><div class="coach-tag">${c.tag}</div></div><div class="coach-main"><h3>${c.name}<span class="copper-dot">.</span></h3><p>${c.role}</p><div class="coach-actions"><button type="button" data-coach-expand="${c.id}" aria-expanded="false" aria-controls="coach-details-${c.id}">MEET ${c.name.split(' ')[0]}</button><button type="button" data-coach-book="${c.id}">BOOK A SESSION ↗</button></div></div><div class="coach-details" id="coach-details-${c.id}" hidden><p>${c.intro}</p><span>SPECIALTIES</span><ul>${c.specialties.map(v=>`<li>${v}</li>`).join('')}</ul></div></article>`).join('');
   $$('.coach-portrait img').forEach(image=>image.addEventListener('error',()=>{image.onerror=null;image.src='assets/coach-1.svg';}));
   $$('[data-coach-expand]').forEach(btn=>btn.addEventListener('click',()=>{
     const details=$('#coach-details-'+btn.dataset.coachExpand),open=details.hidden;details.hidden=!open;btn.setAttribute('aria-expanded',String(open));btn.textContent=open?'CLOSE DETAILS':'MEET '+coaches.find(c=>c.id===btn.dataset.coachExpand).name.split(' ')[0];
   }));
   $$('[data-coach-book]').forEach(btn=>btn.addEventListener('click',()=>{
     const coach=coaches.find(c=>c.id===btn.dataset.coachBook);$('#dialog-title').textContent='TRAIN WITH '+coach.name.split(' ')[0]+'.';
-    $('#dialog-copy').textContent='This is a demonstration coach profile. The booking button shows the intended flow until real staff scheduling is connected.';
+    $('#dialog-copy').textContent='Online coach bookings are not available yet. Explore the options and use the visit page to get started.';
     $('#dialog-details').innerHTML=`<div class="dialog-detail"><strong>${coach.role}</strong><br>${coach.specialties.join(' • ')}</div>`;
     $('#dialog-pass-link').textContent='START WITH A DAY PASS ↗';
     $('#dialog-pass-link').href='visit.html?goal='+encodeURIComponent('Coaching and guidance')+'#free-pass';showDialog();
@@ -381,10 +381,10 @@
   if ($('#faq-list')) {
   /* 13. FAQ — NATIVE KEYBOARD-ACCESSIBLE DETAILS */
   const faqs=[
-    ['Do I need experience to join?','No experience is required for the intended Iron Gym concept. The first-visit guide and photo tour are designed to make getting started less intimidating. Verify actual coaching availability before publishing.'],
+    ['Do I need experience to join?','No experience is required to get started. Start with a photo tour or the first-visit guide to find your footing.'],
     ['Can I train without taking classes?','Yes, in this proposed membership structure, Open Gym provides independent training access. Confirm final operating policies and staffed hours with the gym.'],
     ['Are the prices displayed here final?','No. All memberships, discounts and inclusions shown are example data for this website prototype. The gym owner must provide real fees, commitments and cancellation terms.'],
-    ['Is the gym capacity display live?','Not yet. The meter intentionally uses simulated demand by time of day. It is labeled as a demonstration and can be connected to a secure occupancy data source later.'],
+    ['Is the gym capacity display live?','Not yet. The meter intentionally uses simulated demand by time of day. The chart is an estimate, not a real-time count.'],
     ['Does the free day pass form actually send a request?','Not in this preview. The form validates information and demonstrates a successful interface state, but no information is transmitted or stored. A secure pass-claim endpoint is required before launch.'],
     ['Can I reserve a class or coaching session here?','You can explore sessions, download an example calendar event and preview coach profiles. Actual booking requires the gym’s calendar or scheduling provider.'],
     ['How do I find the gym and see its opening hours?','The real street address, city, hours and map will be shown once the facility information is provided. This prototype deliberately avoids inventing a location.']
@@ -461,14 +461,14 @@
   $('#pass-again').addEventListener('click',()=>{passForm.reset();$$('.field-error').forEach(e=>e.textContent='');$$('[aria-invalid]',passForm).forEach(e=>e.removeAttribute('aria-invalid'));passForm.hidden=false;success.hidden=true;dateField.min=todayISO();$('#pass-name').focus();});
   }
 
-  /* 15. CONCEPT GYM PHOTO TOUR — MANUAL, ACCESSIBLE GALLERY */
+  /* 15. GYM PHOTO TOUR — ACCESSIBLE, SWIPEABLE GALLERY */
   if ($('#photo-tour')) {
     const zones = [
       {
         label: 'THE STRENGTH FLOOR',
         name: 'THE STRENGTH FLOOR',
         image: 'assets/iron-floor.webp',
-        alt: 'Real strength gym interior with barbells and lifting platforms',
+        alt: 'Strength gym interior with barbells and lifting platforms',
         copy: 'A place for focused work: sturdy equipment, room to move and no distractions from the next set.',
         features: ['BARBELLS', 'PLATFORMS', 'TRAINING SPACE']
       },
@@ -492,7 +492,7 @@
         label: 'CONDITIONING',
         name: 'THE CONDITIONING ZONE',
         image: 'assets/iron-conditioning.webp',
-        alt: 'Real fitness studio with cardio equipment and training machines',
+        alt: 'Fitness studio with cardio equipment and training machines',
         copy: 'Strength is the foundation, not the finish line. Make room to build a stronger engine, too.',
         features: ['CARDIO', 'ENDURANCE', 'MOVEMENT']
       },
@@ -507,12 +507,19 @@
     ];
     const photo=$('#tour-photo'), position=$('#tour-position'), stageNumber=$('#tour-stage-index');
     const steps=$$('.tour-step');
+    const stage=$('#tour-swipe-area');
+    const progress=$$('#tour-progress i');
     let current=0;
+    let swipeOrigin=null;
     const preload=zones.map(z => { const img=new Image();img.src=z.image;return img; });
     const renderTour=(idx,shouldFocus=false)=>{
       current=(idx+zones.length)%zones.length;
       const z=zones[current],number=pad(current+1);
       photo.src=z.image;photo.alt=z.alt;
+      if(!window.matchMedia('(prefers-reduced-motion: reduce)').matches && photo.animate) {
+        photo.getAnimations().forEach(animation=>animation.cancel());
+        photo.animate([{opacity:.35,transform:'scale(1.025)'},{opacity:1,transform:'scale(1)'}],{duration:260,easing:'ease-out'});
+      }
       $('#tour-photo-label').textContent=z.label;
       $('#tour-photo-counter').textContent=`${number} / ${pad(zones.length)}`;
       stageNumber.textContent=number;position.textContent=number;
@@ -520,12 +527,26 @@
       $('#tour-copy').textContent=z.copy;
       $('#tour-features').replaceChildren(...z.features.map(value=>{const el=document.createElement('span');el.textContent=value;return el;}));
       steps.forEach((button,i)=>{const active=i===current;button.classList.toggle('is-active',active);button.setAttribute('aria-pressed',String(active));});
+      progress.forEach((marker,i)=>marker.classList.toggle('is-active',i===current));
       if(shouldFocus)steps[current].focus({preventScroll:true});
       announce(`${z.name}. Photo ${current+1} of ${zones.length}. ${z.copy}`);
     };
     $('#tour-prev').addEventListener('click',()=>renderTour(current-1));
     $('#tour-next').addEventListener('click',()=>renderTour(current+1));
     steps.forEach(button=>button.addEventListener('click',()=>renderTour(Number(button.dataset.tourZone))));
+    // Horizontal swipes change photos. Vertical gestures remain native page scrolling.
+    stage.addEventListener('pointerdown', event=>{
+      if(event.pointerType!=='touch' && event.pointerType!=='pen')return;
+      swipeOrigin={id:event.pointerId,x:event.clientX,y:event.clientY};
+      try { stage.setPointerCapture(event.pointerId); } catch(_) {}
+    },{passive:true});
+    stage.addEventListener('pointerup', event=>{
+      if(!swipeOrigin || swipeOrigin.id!==event.pointerId)return;
+      const dx=event.clientX-swipeOrigin.x,dy=event.clientY-swipeOrigin.y;
+      swipeOrigin=null;
+      if(Math.abs(dx)>=45 && Math.abs(dx)>Math.abs(dy)*1.2) renderTour(current+(dx<0?1:-1));
+    },{passive:true});
+    stage.addEventListener('pointercancel',()=>{swipeOrigin=null;},{passive:true});
     $('#photo-tour').addEventListener('keydown',event=>{
       if(event.target.matches('.tour-step')) {
         if(event.key==='ArrowRight' || event.key==='ArrowDown') {event.preventDefault();renderTour(Number(event.target.dataset.tourZone)+1,true);}
