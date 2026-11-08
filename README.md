@@ -36,3 +36,7 @@ Ten locally hosted WebP images in `assets/` were generated specifically for this
 
 ## Forged motion system
 Cross-page transitions use a short, non-blocking copper progress stroke, with a gentle arrival animation and a bfcache-safe return state. Fine-pointer visitors get subtle magnetic CTA feedback and spotlighted photo cards. A hand-authored barbell/rack outline draws in the desktop hero. The existing IntersectionObserver reveal system adds one-time photo lifts. All enhancements disable gracefully under `prefers-reduced-motion`, and touch users retain native scrolling/swiping. No additional JS or animation libraries.
+
+### Typography readability update (November 2026)
+
+Improved text sizing and spacing across all seven pages. Body copy defaults to a legible 16px, mobile CTAs and nav are larger, and form controls meet a 16px mobile input font size. Major display headlines keep their industrial design. Check phone, tablet, desktop, and reduced-motion variants when editing these styles.
