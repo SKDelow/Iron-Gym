@@ -12,6 +12,24 @@ python -m http.server 8080
 
 Then open `http://localhost:8080/`. Google Fonts loads when internet access is available; carefully selected system-font fallbacks are included.
 
+## Multi-page navigation (2026 redesign)
+
+Iron Gym now uses seven dedicated pages instead of one long landing page. Each page has its own H1, title, meta description and accessible active navigation. No client-side router or framework is needed.
+
+| Page | Purpose |
+| --- | --- |
+| `index.html` | Short homepage, gateway cards, space introduction, first-visit CTA |
+| `about.html` | Training philosophy, amenities, illustrative transformation slider and testimonials |
+| `programs.html` | Five-question Program Finder and optional saved recommendation |
+| `classes.html` | Filterable 20-session demo class schedule, calendar export and simulated capacity |
+| `memberships.html` | Demo membership tiers, annual billing comparison, cost-per-visit and FAQ |
+| `coaches.html` | Fictional coach profiles, specialty details and booking-preview dialog |
+| `visit.html` | Interactive first-visit field guide and free-pass form demonstration |
+
+The shared `app.js` now initializes each feature **only on pages that contain its UI**, and interactive pathways across pages use normal links and URL parameters. Program recommendations can open matching memberships, and membership choices carry the visitor's training goal to the visit form. An optional saved recommendation stays on the current device without storing quiz answers. All calls to real booking, capacity and lead-capture services remain opt-in and disabled by default.
+
+**Links and SEO:** Each page is referenced in `sitemap.xml`. Update the Netlify domain in `sitemap.xml` and `robots.txt` if a custom domain is connected.
+
 ## Deploy on Netlify
 
 Upload the entire folder or ZIP to Netlify's manual deploy interface, or connect it to a GitHub repository. The site is static: **no build step, Node.js, framework, or paid package** is required. `netlify.toml` sets the publish folder to the repository root.
@@ -20,7 +38,7 @@ Upload the entire folder or ZIP to Netlify's manual deploy interface, or connect
 
 ## Change the content
 
-Edit `config.js` for business identity, facility location, hours, membership prices, social URLs, and API integration endpoints. Classes, coach biographies, amenities and FAQ content are sample data in clearly labeled sections of `app.js`; you can replace them there with verified gym data. Main editorial copy and section structure is in `index.html`. Color, layout and animation variables are at the top of `styles.css`.
+Edit `config.js` for business identity, facility location, hours, membership prices, social URLs, and API integration endpoints. Classes, coach biographies, amenities and FAQ content are sample data in clearly labeled sections of `app.js`; you can replace them there with verified gym data. Editorial content is organized across the seven HTML pages listed below. `index.html` is now a concise landing page; the interactive sections have their own dedicated pages. Color, layout and animation variables are at the top of `styles.css`.
 
 ### Placeholder photography
 

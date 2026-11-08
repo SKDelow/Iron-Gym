@@ -17,6 +17,7 @@
   const scrollToId = id => document.getElementById(id)?.scrollIntoView({behavior:reduceMotion?'instant':'smooth',block:'start'});
   const weekdays = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
   const safeDate = date => new Date(date.getFullYear(),date.getMonth(),date.getDate());
+  const pad=n=>String(n).padStart(2,'0');
 
   /* 1. BRAND CONFIG, LOCATION + SEARCH METADATA */
   const locationLabel = `${cfg.city || 'CITY'}, ${cfg.state || 'STATE'}`;
@@ -48,8 +49,10 @@
     if(/^https:\/\//.test(cfg.websiteUrl || '')) schema.url = cfg.websiteUrl;
     if(cfg.phone) schema.telephone = cfg.phone;
     const script = document.createElement('script');script.type='application/ld+json';script.textContent=JSON.stringify(schema);document.head.append(script);
-    document.title = `${cfg.name} — Strength Training in ${cfg.city}, ${cfg.state}`;
-    $('meta[name="description"]').content = `Explore strength training, coaching and memberships at ${cfg.name} in ${cfg.city}, ${cfg.state}. Find your program and plan a first visit.`;
+    if(document.body.dataset.page==='index') {
+      document.title = `${cfg.name} — Strength Training in ${cfg.city}, ${cfg.state}`;
+      $('meta[name="description"]').content = `Explore strength training, coaching and memberships at ${cfg.name} in ${cfg.city}, ${cfg.state}. Find your program and plan a first visit.`;
+    }
   }
 
   /* 2. MOBILE NAVIGATION */
@@ -88,6 +91,30 @@
     $$('.stat-number').forEach(el => counterObserver.observe(el));
   } else $$('.stat-number').forEach(animateCounter);
 
+
+  const savedPathKey = 'iron-gym-forged-training-path-v1';
+  function readSavedPath(){
+    try {
+      const saved=JSON.parse(localStorage.getItem(savedPathKey)||'null');
+      return saved && ['open','performance','coaching'].includes(saved.plan) && ['Strength','Conditioning','Foundations','Small Group'].includes(saved.classType) ? saved : null;
+    } catch {return null;}
+  }
+  function refreshSavedPath(){
+    const saved=readSavedPath();
+    const bar=$('#saved-path');
+    if(!bar)return;
+    bar.hidden=!saved;
+    if(!saved)return;
+    $('#saved-path-name').textContent=(cfg.pricing?.[saved.plan]?.name || saved.plan).toUpperCase();
+    $('#saved-path-summary').textContent=`YOUR FOCUS / ${saved.classType.toUpperCase()} TRAINING`;
+  }
+  $('#forget-path')?.addEventListener('click',()=>{
+    try{localStorage.removeItem(savedPathKey);}catch{}
+    refreshSavedPath();announce('Saved training path cleared.');
+  });
+  refreshSavedPath();
+
+  if ($('#quiz-question-area')) {
   /* 4. PROGRAM FINDER — FIVE ACTUAL QUESTIONS */
   const questions = [
     {title:'WHAT ARE YOU HERE TO BUILD?',subtitle:'Pick the answer that sounds most like you.',options:[
@@ -110,26 +137,6 @@
   const questionArea = $('#quiz-question-area'), quizBack = $('#quiz-back'),quizNext=$('#quiz-next');
   const quizProgressText = $('#quiz-progress-text'),quizProgressFill=$('#quiz-progress-fill');
   let lastRecommendation = null;
-  const savedPathKey = 'iron-gym-forged-training-path-v1';
-  function readSavedPath(){
-    try {
-      const saved=JSON.parse(localStorage.getItem(savedPathKey)||'null');
-      return saved && ['open','performance','coaching'].includes(saved.plan) && ['Strength','Conditioning','Foundations','Small Group'].includes(saved.classType) ? saved : null;
-    } catch {return null;}
-  }
-  function refreshSavedPath(){
-    const saved=readSavedPath();
-    const bar=$('#saved-path');
-    bar.hidden=!saved;
-    if(!saved)return;
-    $('#saved-path-name').textContent=(cfg.pricing?.[saved.plan]?.name || saved.plan).toUpperCase();
-    $('#saved-path-summary').textContent=`YOUR FOCUS / ${saved.classType.toUpperCase()} TRAINING`;
-  }
-  $('#forget-path').addEventListener('click',()=>{
-    try{localStorage.removeItem(savedPathKey);}catch{}
-    refreshSavedPath();renderPlans();announce('Saved training path cleared.');
-  });
-  refreshSavedPath();
   function recommend() {
     const [goal,experience,frequency,style,barrier] = quiz.answers;
     const score = {open:0,performance:0,coaching:0};
@@ -170,16 +177,15 @@
       $('#save-path').addEventListener('click',()=>{
         try {
           localStorage.setItem(savedPathKey, JSON.stringify({plan:match.plan,classType:match.classType}));
-          refreshSavedPath();renderPlans();
+          refreshSavedPath();
           $('#save-path').textContent='SAVED ON THIS DEVICE ✓';
           $('#save-path').disabled=true;
           announce('Your training path has been saved on this device.');
         } catch {
-          $('#save-path-note').textContent='Your browser blocked local storage. You can still compare memberships below.';
+          $('#save-path-note').textContent='Your browser blocked local storage. You can still compare memberships on the next page.';
         }
       });
-      $('#value-plan').value=match.plan;renderValue();
-      if(match.plan==='coaching') renderVisit('new');
+
       announce('Program Finder result: '+(cfg.pricing?.[match.plan]?.name || match.plan));return;
     }
     const q=questions[quiz.index],chosen=quiz.answers[quiz.index];
@@ -193,7 +199,7 @@
     quizBack.textContent='← BACK';
   }
   quizNext.addEventListener('click',()=>{
-    if(quiz.complete){scrollToId('memberships');return;}
+    if(quiz.complete){window.location.assign('memberships.html?plan='+encodeURIComponent((lastRecommendation||recommend()).plan));return;}
     if(!quiz.answers[quiz.index])return;
     if(quiz.index===4)quiz.complete=true;else quiz.index++;
     renderQuiz();
@@ -205,6 +211,9 @@
   });
   renderQuiz();
 
+  }
+
+  if ($('#day-tabs')) {
   /* 5. WEEKLY CLASS SCHEDULE / CALENDAR EVENT EXPORT */
   const schedule = [
     ['Monday','06:00','Strength Lab','Strength','Mara','High','60 min','Progressive full-body lifting with technical coaching.'],
@@ -270,7 +279,6 @@
     if(date<=now)date.setDate(date.getDate()+7);
     return date;
   }
-  const pad=n=>String(n).padStart(2,'0');
   function icsDate(date){return `${date.getFullYear()}${pad(date.getMonth()+1)}${pad(date.getDate())}T${pad(date.getHours())}${pad(date.getMinutes())}00`;}
   function downloadCalendarEvent(item){
     const start=dateForNextClass(item.day,item.time),end=new Date(start.getTime()+parseInt(item.duration,10)*60000);
@@ -291,6 +299,9 @@
   }
   $('#dialog-pass-link').addEventListener('click',()=>{dialog.close?.();});
 
+  }
+
+  if ($('#plan-cards')) {
   /* 7. MEMBERSHIPS / PRICING TOGGLE / TRUE COST PER VISIT */
   const plans = {
     open:{key:'open',name:cfg.pricing?.open?.name||'OPEN GYM',price:Number(cfg.pricing?.open?.monthly)||49,subtitle:cfg.pricing?.open?.description||'Independent training, your way.',features:['Training floor access','Full strength equipment','Open gym hours','Digital training resources'],cta:'CHOOSE OPEN GYM'},
@@ -309,14 +320,15 @@
     renderValue();
   }
   function selectPlan(key){
-    $('#value-plan').value=key;renderValue();
-    const goal=$('#pass-goal');goal.value=key==='coaching'?'Coaching and guidance':key==='performance'?'Conditioning and classes':'Strength training';
-    announce(plans[key].name+' selected. Visit the pass form to continue.');scrollToId('free-pass');
+    const goal=key==='coaching'?'Coaching and guidance':key==='performance'?'Conditioning and classes':'Strength training';
+    announce(plans[key].name+' selected. Continue on the visit page.');
+    window.location.assign('visit.html?plan='+encodeURIComponent(key)+'&goal='+encodeURIComponent(goal)+'#free-pass');
   }
   $('#billing-monthly').addEventListener('click',()=>{billing='monthly';renderPlans();});
   $('#billing-annual').addEventListener('click',()=>{billing='annual';renderPlans();});
   Object.values(plans).forEach(plan=>$('#value-plan').add(new Option(plan.name,plan.key)));
-  $('#value-plan').value='performance';
+  const queryPlan=new URLSearchParams(location.search).get('plan');
+  $('#value-plan').value=plans[queryPlan] ? queryPlan : (readSavedPath()?.plan || 'performance');
   function renderValue(){
     const visits=Number($('#visits-slider').value),key=$('#value-plan').value||'performance',plan=plans[key];
     const yearly=billing==='annual'?plan.price*annualMonths:plan.price*12;
@@ -331,6 +343,9 @@
   $('#value-plan').addEventListener('change',renderValue);
   renderPlans();
 
+  }
+
+  if ($('#capacity-ring')) {
   /* 8. GYM CAPACITY / PLUGGABLE API ADAPTER + HOURLY FORECAST */
   const hourlyProfile=[9,7,6,6,12,24,38,45,52,44,36,40,53,46,42,49,62,76,88,77,58,43,28,17];
   function localGymHour(){try{return Number(new Intl.DateTimeFormat('en-US',{hour:'numeric',hour12:false,timeZone:cfg.timezone||'America/Boise'}).format(new Date()))%24;}catch{return new Date().getHours();}}
@@ -375,7 +390,12 @@
   $('#capacity-refresh').addEventListener('click',updateCapacity);
   updateCapacity();setInterval(updateCapacity,60000);
 
+  }
+
+  if ($('#coach-grid')) {
   /* 9. COACHES / EXPANDABLE PROFILES / SESSION PREVIEW */
+  const dialog=$('#booking-dialog');
+  const showDialog=()=>{if(typeof dialog.showModal==='function')dialog.showModal();else dialog.setAttribute('open','');};
   const coaches=[
     {id:'mara',name:'MARA REYES',role:'STRENGTH & TECHNIQUE',tag:'COACH 01',img:'assets/coach-1.svg',intro:'Clear progressions, excellent form and the confidence to add weight when you are ready.',specialties:['Barbell lifting','Beginner strength','Movement quality']},
     {id:'jalen',name:'JALEN PRICE',role:'CONDITIONING & PERFORMANCE',tag:'COACH 02',img:'assets/coach-2.svg',intro:'Conditioning built around smart effort. Train hard, recover well, and keep showing up.',specialties:['Conditioning','Work capacity','Athletic performance']},
@@ -390,9 +410,14 @@
     $('#dialog-copy').textContent='This is a demonstration coach profile. The booking button shows the intended flow until real staff scheduling is connected.';
     $('#dialog-details').innerHTML=`<div class="dialog-detail"><strong>${coach.role}</strong><br>${coach.specialties.join(' • ')}</div>`;
     $('#dialog-pass-link').textContent='START WITH A DAY PASS ↗';
-    $('#pass-goal').value='Coaching and guidance';showDialog();
+    $('#dialog-pass-link').href='visit.html?goal='+encodeURIComponent('Coaching and guidance')+'#free-pass';showDialog();
   }));
 
+
+  $('#dialog-pass-link')?.addEventListener('click',()=>dialog.close?.());
+  }
+
+  if ($('#compare-range')) {
   /* 10. COMPARISON SLIDER (NATIVE RANGE, NO PLUGIN) */
   const compare=$('#compare-range'),stage=$('#compare-stage');
   function showComparison(){
@@ -419,6 +444,9 @@
   window.addEventListener('resize',showComparison);
   showComparison();
 
+  }
+
+  if ($('#amenity-grid')) {
   /* 11. AMENITIES WITH ORIGINAL SVG ICONS */
   const amenities=[
     ['i-plates','FREE WEIGHTS','Serious lifting equipment and room to use it.'],
@@ -432,6 +460,9 @@
   ];
   $('#amenity-grid').innerHTML=amenities.map(([svg,title,copy])=>`<article class="amenity">${icon(svg).replace('<svg ','<svg class="amenity-icon" ')}<div><h3>${title}</h3><p>${copy}</p></div></article>`).join('');
 
+  }
+
+  if ($('#visit-steps')) {
   /* 12. FIRST-VISIT GUIDED TOUR / PERSONALIZED SEQUENCE */
   const guides={
     new:[['ARRIVE AND GET ORIENTED','Meet the front-desk team, see the floor, and ask where everything lives.'],['TAKE A QUICK WALKTHROUGH','Learn the layout and find the equipment you will actually need.'],['START WITH THE BASICS','Practice a few comfortable movements. No need to max out on day one.'],['LEAVE WITH A SIMPLE NEXT STEP','Know what to do on your second visit, not just your first.']],
@@ -445,6 +476,9 @@
   $$('.visit-option').forEach(button=>button.addEventListener('click',()=>renderVisit(button.dataset.visit)));
   renderVisit('new');
 
+  }
+
+  if ($('#faq-list')) {
   /* 13. FAQ — NATIVE KEYBOARD-ACCESSIBLE DETAILS */
   const faqs=[
     ['Do I need experience to join?','No experience is required for the intended Iron Gym concept. The program finder and first-visit guide are designed to make getting started less intimidating. Verify actual coaching availability before publishing.'],
@@ -457,6 +491,9 @@
   ];
   $('#faq-list').innerHTML=faqs.map(([q,a])=>`<details><summary>${escapeHTML(q)}</summary><p>${escapeHTML(a)}</p></details>`).join('');
 
+  }
+
+  if ($('#pass-form')) {
   // The fixed phone CTA is hidden when the actual pass form is in view,
   // avoiding two competing buttons and preventing form controls being covered.
   if ('IntersectionObserver' in window) {
@@ -468,6 +505,8 @@
 
   /* 14. FREE DAY PASS — FIELD VALIDATION / HONEST FRONTEND SUCCESS STATE */
   const passForm=$('#pass-form'),success=$('#pass-success'),dateField=$('#pass-day');
+  const requestedGoal=new URLSearchParams(location.search).get('goal');
+  if(requestedGoal && [...$('#pass-goal').options].some(x=>x.value===requestedGoal))$('#pass-goal').value=requestedGoal;
   const todayISO=()=>{const d=new Date();return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`;};
   dateField.min=todayISO();
   const passLive=Boolean(cfg.liveFormsEnabled && /^https:\/\//.test(cfg.privacyPolicyUrl || '') && cfg.integrations?.freePassEndpoint);
@@ -520,4 +559,6 @@
     announce('Pass form preview completed. Nothing was submitted or saved.');
   });
   $('#pass-again').addEventListener('click',()=>{passForm.reset();$$('.field-error').forEach(e=>e.textContent='');$$('[aria-invalid]',passForm).forEach(e=>e.removeAttribute('aria-invalid'));passForm.hidden=false;success.hidden=true;dateField.min=todayISO();$('#pass-name').focus();});
+  }
+
 })();
