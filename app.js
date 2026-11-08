@@ -110,6 +110,26 @@
   const questionArea = $('#quiz-question-area'), quizBack = $('#quiz-back'),quizNext=$('#quiz-next');
   const quizProgressText = $('#quiz-progress-text'),quizProgressFill=$('#quiz-progress-fill');
   let lastRecommendation = null;
+  const savedPathKey = 'iron-gym-forged-training-path-v1';
+  function readSavedPath(){
+    try {
+      const saved=JSON.parse(localStorage.getItem(savedPathKey)||'null');
+      return saved && ['open','performance','coaching'].includes(saved.plan) && ['Strength','Conditioning','Foundations','Small Group'].includes(saved.classType) ? saved : null;
+    } catch {return null;}
+  }
+  function refreshSavedPath(){
+    const saved=readSavedPath();
+    const bar=$('#saved-path');
+    bar.hidden=!saved;
+    if(!saved)return;
+    $('#saved-path-name').textContent=(cfg.pricing?.[saved.plan]?.name || saved.plan).toUpperCase();
+    $('#saved-path-summary').textContent=`YOUR FOCUS / ${saved.classType.toUpperCase()} TRAINING`;
+  }
+  $('#forget-path').addEventListener('click',()=>{
+    try{localStorage.removeItem(savedPathKey);}catch{}
+    refreshSavedPath();renderPlans();announce('Saved training path cleared.');
+  });
+  refreshSavedPath();
   function recommend() {
     const [goal,experience,frequency,style,barrier] = quiz.answers;
     const score = {open:0,performance:0,coaching:0};
@@ -144,9 +164,20 @@
     quizBack.hidden = quiz.index===0 && !quiz.complete;
     if(quiz.complete){
       const match=recommend();lastRecommendation=match;
-      questionArea.innerHTML=`<div class="quiz-result"><div class="quiz-result-kicker">YOUR RECOMMENDED STARTING POINT</div><h3>${escapeHTML(cfg.pricing?.[match.plan]?.name || match.plan.toUpperCase())}<span class="copper-dot">.</span></h3><p>${escapeHTML(match.reason)}</p><div class="quiz-result-grid"><div><span>RECOMMENDED FORMAT</span><strong>${escapeHTML(match.classType)} TRAINING</strong></div><div><span>FIRST MOVE</span><strong>EXPLORE ${escapeHTML(match.plan.toUpperCase())}</strong></div></div><p class="quiz-result-notice">A starting recommendation, not a fitness assessment. Adjust the plan based on your needs and available programs.</p></div>`;
+      questionArea.innerHTML=`<div class="quiz-result"><div class="quiz-result-kicker">YOUR RECOMMENDED STARTING POINT</div><h3>${escapeHTML(cfg.pricing?.[match.plan]?.name || match.plan.toUpperCase())}<span class="copper-dot">.</span></h3><p>${escapeHTML(match.reason)}</p><div class="quiz-result-grid"><div><span>RECOMMENDED FORMAT</span><strong>${escapeHTML(match.classType)} TRAINING</strong></div><div><span>FIRST MOVE</span><strong>EXPLORE ${escapeHTML(match.plan.toUpperCase())}</strong></div></div><p class="quiz-result-notice">A starting recommendation, not a fitness assessment. Adjust the plan based on your needs and available programs.</p><div class="save-path-cta"><button type="button" id="save-path">SAVE MY STARTING POINT ↗</button><small id="save-path-note">Optional. Saves only this recommendation on this device—never your quiz answers.</small></div></div>`;
       quizNext.innerHTML=`SEE MEMBERSHIP OPTIONS ${icon('i-arrow')}`;
       quizNext.disabled=false;quizBack.textContent='↻ START AGAIN';
+      $('#save-path').addEventListener('click',()=>{
+        try {
+          localStorage.setItem(savedPathKey, JSON.stringify({plan:match.plan,classType:match.classType}));
+          refreshSavedPath();renderPlans();
+          $('#save-path').textContent='SAVED ON THIS DEVICE ✓';
+          $('#save-path').disabled=true;
+          announce('Your training path has been saved on this device.');
+        } catch {
+          $('#save-path-note').textContent='Your browser blocked local storage. You can still compare memberships below.';
+        }
+      });
       $('#value-plan').value=match.plan;renderValue();
       if(match.plan==='coaching') renderVisit('new');
       announce('Program Finder result: '+(cfg.pricing?.[match.plan]?.name || match.plan));return;
@@ -272,7 +303,7 @@
     $('#billing-annual').classList.toggle('is-active',billing==='annual');$('#billing-annual').setAttribute('aria-pressed',String(billing==='annual'));
     $('#plan-cards').innerHTML=Object.values(plans).map(plan=>{
       const annual=plan.price*annualMonths,savings=plan.price*12-annual,equivalent=annual/12;
-      return `<article class="plan-card ${plan.popular?'is-popular':''}"><div class="plan-top"><div class="plan-name"><h3>${escapeHTML(plan.name)}</h3>${plan.popular?'<span>MOST CHOSEN / DEMO</span>':''}</div><p class="plan-subtitle">${escapeHTML(plan.subtitle)}</p><div class="plan-price"><b>${billing==='monthly'?money(plan.price).replace('.00',''):money(equivalent)}</b><span>/MO</span></div><p class="plan-billing">${billing==='annual'?`BILLED ${money(annual)} / YEAR · SAVE ${money(savings)} VS MONTHLY`:'MONTH-TO-MONTH DEMO RATE · NO CONTRACT TERMS PROVIDED'}</p></div><div class="plan-features"><strong>WHAT'S INCLUDED</strong><ul>${plan.features.map(f=>`<li>${icon('i-check')}<span>${escapeHTML(f)}</span></li>`).join('')}</ul></div><div class="plan-bottom"><button type="button" class="button button-copper" data-choose-plan="${plan.key}">${plan.cta} ${icon('i-arrow')}</button><small>Sample pricing and benefits, not an offer.</small></div></article>`;
+      return `<article class="plan-card ${plan.popular?'is-popular':''} ${readSavedPath()?.plan===plan.key?'is-saved':''}"><div class="plan-top"><div class="plan-name"><h3>${escapeHTML(plan.name)}</h3>${readSavedPath()?.plan===plan.key?'<span class="saved-match-tag">YOUR SAVED MATCH</span>':plan.popular?'<span>MOST CHOSEN / DEMO</span>':''}</div><p class="plan-subtitle">${escapeHTML(plan.subtitle)}</p><div class="plan-price"><b>${billing==='monthly'?money(plan.price).replace('.00',''):money(equivalent)}</b><span>/MO</span></div><p class="plan-billing">${billing==='annual'?`BILLED ${money(annual)} / YEAR · SAVE ${money(savings)} VS MONTHLY`:'MONTH-TO-MONTH DEMO RATE · NO CONTRACT TERMS PROVIDED'}</p></div><div class="plan-features"><strong>WHAT'S INCLUDED</strong><ul>${plan.features.map(f=>`<li>${icon('i-check')}<span>${escapeHTML(f)}</span></li>`).join('')}</ul></div><div class="plan-bottom"><button type="button" class="button button-copper" data-choose-plan="${plan.key}">${plan.cta} ${icon('i-arrow')}</button><small>Sample pricing and benefits, not an offer.</small></div></article>`;
     }).join('');
     $$('[data-choose-plan]').forEach(btn=>btn.addEventListener('click',()=>selectPlan(btn.dataset.choosePlan)));
     renderValue();

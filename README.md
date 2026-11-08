@@ -96,3 +96,11 @@ Vanilla JS, no client framework, no giant animation bundle, CSS/SVG-driven artwo
 ---
 
 Design concept: **IRON GYM / FORGED — Built for the Work**. The visual direction is deliberately dark, gritty, professional and clean: iron black, gunmetal, forged copper and bone white, with the original barbell-mark and motion line motif.
+
+## 2026 design refinements — Forged update
+
+This iteration incorporates select concepts from the Lovable 2026 design-trends roundup while preserving the established dark / copper industrial identity. Changes include expressive CSS-only hero typography, a custom layered weight-plate emblem, restrained functional motion for choices and CTAs, and subtle desktop-only asymmetry. All CSS motion respects `prefers-reduced-motion`. No WebGL, AI API, animation library, or additional tracking dependency was added.
+
+The Program Finder now includes an **optional** “Save my starting point” control. It stores only the recommended plan and training category in local browser storage (never quiz answers, email, or behavioral history), shows a returning-visitor reminder, and supports one-click clearing. It makes no server requests.
+
+Reference: https://lovable.dev/guides/website-design-trends-2026
