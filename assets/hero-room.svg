@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 1000">
+<defs>
+ <linearGradient id="wall" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#10191a"/><stop offset=".5" stop-color="#293133"/><stop offset="1" stop-color="#090e0f"/></linearGradient>
+ <linearGradient id="floor" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#28302e"/><stop offset="1" stop-color="#0b0f10"/></linearGradient>
+ <radialGradient id="light" cx=".5" cy=".1" r=".7"><stop stop-color="#a6a59c" stop-opacity=".43"/><stop offset=".35" stop-color="#667372" stop-opacity=".15"/><stop offset="1" stop-color="#0a0e0e" stop-opacity="0"/></radialGradient>
+ <linearGradient id="metal" x1="0" y1="0" x2="1" y2="0"><stop stop-color="#1b2426"/><stop offset=".25" stop-color="#748080"/><stop offset=".45" stop-color="#1b2224"/><stop offset=".8" stop-color="#444f4e"/><stop offset="1" stop-color="#10181b"/></linearGradient>
+ <radialGradient id="plate" cx=".26" cy=".27" r=".8"><stop stop-color="#505a59"/><stop offset=".5" stop-color="#181f20"/><stop offset="1" stop-color="#070b0c"/></radialGradient>
+ <filter id="soft"><feGaussianBlur stdDeviation="36"/></filter><filter id="deep"><feGaussianBlur stdDeviation="14"/></filter>
+</defs>
+<rect width="1600" height="1000" fill="url(#wall)"/>
+<g stroke="#7e8a81" opacity=".15"><path d="M0 175h1600M0 395h1600M0 580h1600" stroke-width="5"/><path d="M120 0v660M360 0v660M610 0v660M860 0v660M1110 0v660M1360 0v660" stroke-width="12"/></g>
+<path d="M0 680 1600 590v410H0Z" fill="url(#floor)"/><g stroke="#7c8c83" stroke-width="2" opacity=".12"><path d="m0 800 1600-100M0 885l1600-100M350 650 100 1000M690 650l580 350M1030 630l490 370M1320 610l280 390"/></g>
+<ellipse cx="1110" cy="170" rx="510" ry="540" fill="url(#light)"/>
+<ellipse cx="1260" cy="630" rx="300" ry="45" fill="#090d0e" opacity=".8" filter="url(#deep)"/>
+<g stroke="url(#metal)" stroke-width="24" fill="none" opacity=".85"><path d="M690 150v610M1260 150v610M680 164h590M710 390h540"/><path d="M795 390v310M1160 390v310" stroke-width="12"/></g>
+<g stroke="#aeb8ad" stroke-width="4" opacity=".27"><path d="M690 250h570M690 300h570M690 460h570M690 515h570"/></g>
+<g fill="#141a1c" stroke="#59625f" stroke-width="3"><rect x="665" y="138" width="50" height="20"/><rect x="1240" y="138" width="50" height="20"/><rect x="672" y="750" width="44" height="23"/><rect x="1240" y="750" width="44" height="23"/></g>
+<!-- oversized plate foreground -->
+<g transform="translate(1350 570) rotate(-8)"><ellipse cx="60" cy="20" rx="220" ry="310" fill="#080b0d" opacity=".6" filter="url(#deep)"/><ellipse cx="40" cy="0" rx="190" ry="282" fill="url(#plate)" stroke="#52605e" stroke-width="9"/><ellipse cx="40" cy="0" rx="142" ry="219" fill="none" stroke="#8b9790" stroke-width="6" opacity=".27"/><ellipse cx="40" cy="0" rx="116" ry="188" fill="none" stroke="#0a0e0f" stroke-width="22"/><ellipse cx="40" cy="0" rx="35" ry="60" fill="#070b0c" stroke="#687574" stroke-width="10"/><path d="M-86-138c45-104 155-157 242-71" fill="none" stroke="#a0a89f" stroke-width="5" opacity=".16"/><text x="-62" y="-205" fill="#a9b2aa" opacity=".27" font-size="34" font-family="Arial" font-weight="bold">45 LB</text></g>
+<!-- horizontal bar through image -->
+<path d="M730 480H1600" stroke="#0a0c0e" stroke-width="26"/><path d="M730 474H1600" stroke="url(#metal)" stroke-width="12"/><g stroke="#737f7b" stroke-width="4" opacity=".5"><path d="M920 468v14M935 468v14M950 468v14M965 468v14M980 468v14"/></g>
+<!-- spotlight and deliberately raw warehouse light -->
+<g><path d="M960 0v94" stroke="#677470" stroke-width="5"/><path d="M915 94h90l-19 32h-52z" fill="#4c5957"/><ellipse cx="960" cy="124" rx="30" ry="9" fill="#cbd0be"/><path d="m940 132-250 620h520l-220-620" fill="#d4dad1" opacity=".027"/></g>
+<!-- abstract branding stamped into wall -->
+<text x="550" y="260" fill="#9aaba2" font-family="Arial" font-size="170" font-weight="900" opacity=".045" transform="rotate(-90 550 260)">IRON GYM</text>
+<rect width="1600" height="1000" fill="#090e0e" opacity=".18"/>
+</svg>
